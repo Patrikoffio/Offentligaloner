@@ -1,0 +1,24 @@
+# Rådata innehåller persondata – versioneras ALDRIG
+data/
+
+# Hemligheter
+.env
+.env.local
+.env*.local
+
+# Beroenden och byggen
+node_modules/
+.next/
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Supabase lokalt
+supabase/.temp/
+supabase/.branches/
+
+# OS/editor
+.DS_Store
+Thumbs.db
