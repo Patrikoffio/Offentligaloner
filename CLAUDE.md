@@ -190,11 +190,29 @@ Pro) → produktions-deployen NEDTAGEN (`vercel remove`), `offentligaloner.verce
 ger 404 tills skarp go-live. Projekt/länkning/env-vars behållna.
 
 **Kvarstår inför skarp go-live (manuella beslut/åtgärder):**
-1. Granskning av molndata + sidor.
+1. ~~Granskning av molndata~~ KLAR (se nedan). Sid-/SEO-granskning pågår
+   (slug-avstämning + 301-redirects, BLOCKERANDE före DNS-flytt).
 2. Promote av produktions-deployen (`vercel deploy --prod`).
 3. DNS-flytt hos Loopia (offentligaloner.se → Vercel).
 4. Ändringsanmälan till Mediemyndigheten (serverplacering Helsingfors → Stockholm/
    Vercel), därefter uppsägning av Hetzner.
+
+#### Granskning molndata (session 6) – KLAR
+20+ kontroller mot hårda regler + datakvalitet, grönt: publiceringsgrind (min n=5),
+kön endast K/M/NULL, noll sentinelläckage, RLS default-deny (inga policies),
+vyn exkluderar flaggade rader, tim/månad ej blandat, 5 654 unika slugs, 24 kategorier
+(0 NULL), källhänvisning 100 % täckt, allt collection_year=2024. Åtgärdat:
+- **A. Migration 0003**: återkallade anon/authenticated-grants på salary_records,
+  raw_titles, collection_requests, source_documents (djupförsvar utöver RLS).
+  Applicerad moln + lokalt, service_role orörd.
+- **B. Backfill received_at** (`pipeline/backfill_received_at.py`): 3 ur Kommunlista
+  2024 (kol "mottagen lönelista", giltiga datum), 157 ur filnamnsdatum, 0 föll till
+  lönedatum. Alla 160 källdok har nu utlämningsdatum (moln + lokalt).
+- **C. Flaggade 86 rader** med heltidsekv. lön > 200 000 (låg grad × normal lön;
+  `pipeline/flag_fulltime_over_200k.sql`). Ej cappat. Vyer refreshade: national kvar
+  2 116, employer 9 370→9 369, inga titlar tappade n≥5. Effekt: Medicinsk Rådgivare
+  p90 190 160→113 540, Skolläkare 185 000→172 900. Ny snapshot arkiverad.
+- **D.** Små-n seniora roller (Regiondirektör n=6 m.fl.) – noterat, uppfyller n≥5.
 
 #### Återstår i 1b
 - Mappningstäckning via AI-klassning (mapping_method='ai', reviewed=false).
