@@ -110,6 +110,35 @@ Mediemyndigheten. Detta ger kraven nedan – de är juridiska skyldigheter, inte
 4. Rådatafiler i `/data` läses, ändras aldrig.
 5. Ingen deploy utan aggregat-snapshot (arkiveringsskyldigheten ovan).
 
+## Status (uppdaterad 2026-07-21)
+
+### Fas 1 (klar)
+Dump migrerad till v2-schemat och verifierad grön:
+501 517 rader, 145 arbetsgivare, 5 654 slugs totalt, 2 122 titlar med publicerbar data (n≥5).
+
+### Fas 1b (pågår)
+Klart i session 3:
+- employment_rate-verifiering: fördelning ren (67 % heltid, 23 % NULL, 0 ogiltiga).
+  505 rader har fulltime-ekvivalent >200 000 kr p.g.a. låg sysselsättningsgrad (10 %);
+  det är korrekt matematik men bör flaggas vid nästa import-omgång.
+  Medianer för 10 stora yrken är rimliga 2024-nivåer (SSK 37 930 kr, lärare 39 700 kr osv).
+- Sidgenerering utökad: generateStaticParams hämtar nu ALLA 5 654 slugs (paginerat,
+  1 000/batch). Titlar utan n≥5-data renderar "ingen publicerbar statistik ännu"-sida
+  i stället för 404.
+- Snapshot-arkivering: `pipeline/snapshot_archives.py` exporterar title_national_stats
+  (2 122 rader) + title_employer_stats (9 411 rader) till JSON med SHA+tidsstämpel.
+  Lokal mapp: snapshots/ (gitignorerad). Supabase Storage-integration planeras vid go-live.
+- Kategorigranskning (session 3): "Kommunövergripande och Strategiska funktioner" är
+  utpräglad catch-all-kategori (2 515 av 5 654 titlar). Flera felklassade titlar noterade
+  (Tvättbiträde, Beroendeterapeut, Ramppersonal m.fl. borde inte vara Kommunövergripande).
+  Omklassning är ett separat jobb; befintliga kategorier bevaras.
+
+Återstår i 1b:
+- Mappningstäckning via AI-klassning (mapping_method='ai', reviewed=false)
+- Go-live-checklista: färsk Hetzner-dump, verifiering grön, snapshot-pipeline kopplad
+  till Supabase Storage, footeruppgifter kontrollerade, 301-redirects testade, DNS-flytt,
+  ändringsanmälan Mediemyndigheten, Hetzner uppsagt.
+
 ## Faser
 
 - **Fas 1:** Migrera dumpen till v2-schemat (färsk dump från Hetzner före go-live),

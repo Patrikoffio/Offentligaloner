@@ -37,21 +37,27 @@ interface SourceInfo {
   salary_date: string | null;
 }
 
-// ─── Statisk generering – top 50 slugs med mest data ────────────────────────
+// ─── Statisk generering – ALLA generaliserade titlar ─────────────────────────
+// Titlar utan n>=5-data får en "ingen data ännu"-sida i stället för 404.
 
 export async function generateStaticParams() {
-  const { data, error } = await supabaseAdmin
-    .from("title_national_stats")
-    .select("generalized_title_id, n, generalized_titles(slug)")
-    .gte("n", 5)
-    .order("n", { ascending: false })
-    .limit(50);
+  const pageSize = 1000;
+  let from = 0;
+  const slugs: { slug: string }[] = [];
 
-  if (error || !data) return [];
+  while (true) {
+    const { data, error } = await supabaseAdmin
+      .from("generalized_titles")
+      .select("slug")
+      .range(from, from + pageSize - 1);
 
-  return data
-    .map((row: any) => ({ slug: row.generalized_titles?.slug }))
-    .filter(Boolean);
+    if (error || !data || data.length === 0) break;
+    slugs.push(...data.map((row: any) => ({ slug: row.slug })));
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+
+  return slugs;
 }
 
 // ─── Metadata ────────────────────────────────────────────────────────────────
@@ -113,7 +119,7 @@ export default async function YrkeSida({
 
   if (!title) notFound();
 
-  // Hämta nationell statistik
+  // Hämta nationell statistik (kan saknas — titlar utan n>=5 data får ingen-data-sida)
   const { data: national } = await supabaseAdmin
     .from("title_national_stats")
     .select("n, mean_salary, p10, p25, median, p75, p90, collection_year")
@@ -195,6 +201,21 @@ export default async function YrkeSida({
       )}
       {title.ai_description && (
         <p className="text-gray-600 mb-8 max-w-2xl">{title.ai_description}</p>
+      )}
+
+      {/* Ingen data ännu */}
+      {!national && (
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8">
+          <p className="text-gray-700 font-medium mb-1">
+            Ingen publicerbar statistik ännu
+          </p>
+          <p className="text-sm text-gray-500">
+            För att statistik ska visas krävs uppgifter från minst 5 individer
+            med denna titel i vår insamling. Antingen saknas titeln i 2024 års
+            data, eller har den för få förekomster för att publiceras.
+            Statistiken uppdateras när ny data samlas in.
+          </p>
+        </div>
       )}
 
       {/* Lönedistribution */}

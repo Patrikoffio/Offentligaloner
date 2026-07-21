@@ -19,6 +19,10 @@ __pycache__/
 supabase/.temp/
 supabase/.branches/
 
+# Aggregat-snapshots – primär lagring är Supabase Storage (publication_snapshots-bucket)
+# Lokalt under deploy; versioneras ej (kan växa till 100-tals MB)
+snapshots/*.json
+
 # OS/editor
 .DS_Store
 Thumbs.db
