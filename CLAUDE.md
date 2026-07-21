@@ -172,20 +172,29 @@ efter migration 0002.
   komplett i layout.tsx (renderas på varje sida).
 - **Steg 4 – 200-test.** `pipeline/verify_live_urls.py` (slumpar N slugs ur DB,
   kräver HTTP 200 utan redirect). 100/100 slugs → 200 mot förhandsadressen.
-- **Steg 5 – färsk Hetzner-dump: PÅGÅR.** Baslinje oktober 2024 fastställd ur
-  `data/dump/20241027_backup_salaries.dump` (temp-restore): salary_salary 501 517,
-  salary_generalizedtitle 9 383. `pipeline/fetch_hetzner_dump.sh` skapad – kör mot
-  gamla servern med interaktivt SSH-lösenord (inga hemligheter i skript/git),
-  upptäcker rätt DB och dumpar till `data/dump/`. Väntar på att dumpen hämtas;
-  därefter jämförs radantal och migreringen körs om vid avvikelse.
-- **Öppna punkter go-live:**
-  - Deployment Protection kan ej aktiveras – Vercel Hobby saknar Vercel
-    Authentication för produktion (kräver Pro). Beslut: produktions-deployen
-    NEDTAGEN (`vercel remove`), aliaset offentligaloner.vercel.app ger 404 tills
-    skarp go-live. Projekt/länkning/env-vars behålls → go-live = `vercel deploy
-    --prod`. offentligaloner.se är orörd.
-  - Temp-DB `oct_baseline` + `/tmp/oct.dump` i lokala containern städas när
-    steg 5 är klart.
+- **Steg 5 – färsk Hetzner-dump: KLAR.** Gamla servern kör Docker Swarm
+  (`offlon_prod_*`); Django-DB:n har egen POSTGRES_USER (ej 'postgres') och
+  ligger bredvid postgres_exporter + umami-analytics. `fetch_hetzner_dump.sh`
+  (automatik) + `dump_on_server.sh` (plan B, körs på servern) dumpar via
+  containerns egna creds över lokal socket. Färsk dump: salary_salary **501 517**,
+  salary_generalizedtitle **9 383** – IDENTISKT med oktober-baslinjen. Enligt
+  radantals-kriteriet: ingen omkörning av migreringen behövs, v2-datan är färsk.
+  OBS: den fysiska färska dumpen ligger kvar på Hetzner `/tmp` (scp-hemtagning
+  utfördes ej) – hämta hem den som go-live-arkiv innan servern släcks om så önskas.
+- Temp-DB `oct_baseline`/`fresh_verify` + `/tmp/oct.dump`/`/tmp/data.dump` i lokala
+  containern städade. (`/tmp/salaries.dump` från tidigare session lämnad orörd.)
+
+### Go-live-förberedelse KOMPLETT (session 6)
+Steg 1–5 gröna. Deployment Protection kan ej aktiveras på Vercel Hobby (kräver
+Pro) → produktions-deployen NEDTAGEN (`vercel remove`), `offentligaloner.vercel.app`
+ger 404 tills skarp go-live. Projekt/länkning/env-vars behållna.
+
+**Kvarstår inför skarp go-live (manuella beslut/åtgärder):**
+1. Granskning av molndata + sidor.
+2. Promote av produktions-deployen (`vercel deploy --prod`).
+3. DNS-flytt hos Loopia (offentligaloner.se → Vercel).
+4. Ändringsanmälan till Mediemyndigheten (serverplacering Helsingfors → Stockholm/
+   Vercel), därefter uppsägning av Hetzner.
 
 #### Återstår i 1b
 - Mappningstäckning via AI-klassning (mapping_method='ai', reviewed=false).
