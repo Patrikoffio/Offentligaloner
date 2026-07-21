@@ -180,9 +180,10 @@ efter migration 0002.
   därefter jämförs radantal och migreringen körs om vid avvikelse.
 - **Öppna punkter go-live:**
   - Deployment Protection kan ej aktiveras – Vercel Hobby saknar Vercel
-    Authentication för produktion (kräver Pro). vercel.app-aliaset är därmed
-    publikt tills annat beslut (ta ned produktions-deployen, uppgradera, eller
-    middleware-grind). offentligaloner.se är orörd.
+    Authentication för produktion (kräver Pro). Beslut: produktions-deployen
+    NEDTAGEN (`vercel remove`), aliaset offentligaloner.vercel.app ger 404 tills
+    skarp go-live. Projekt/länkning/env-vars behålls → go-live = `vercel deploy
+    --prod`. offentligaloner.se är orörd.
   - Temp-DB `oct_baseline` + `/tmp/oct.dump` i lokala containern städas när
     steg 5 är klart.
 
