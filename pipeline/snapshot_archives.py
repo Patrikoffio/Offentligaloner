@@ -18,11 +18,14 @@ import json
 import os
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import psycopg2
 import psycopg2.extras
+import requests
+
+SNAPSHOT_RETENTION_DAYS = 185  # 6 månader + marginal (utgivningsbevis nr 2024-077)
 
 
 def get_git_sha(fallback: str = "unknown") -> str:
@@ -95,6 +98,68 @@ def fetch_employer_stats(cur: psycopg2.extensions.cursor) -> list[dict]:
     return [_to_float(dict(zip(cols, row))) for row in cur.fetchall()]
 
 
+def _parse_ts_from_name(name: str) -> datetime | None:
+    """Filnamn: <YYYYMMDDTHHMMSSZ>_<sha>.json → tidsstämpel (UTC)."""
+    try:
+        return datetime.strptime(name.split("_", 1)[0], "%Y%m%dT%H%M%SZ").replace(
+            tzinfo=timezone.utc
+        )
+    except (ValueError, IndexError):
+        return None
+
+
+def upload_to_storage(
+    local_path: Path, object_name: str, base_url: str, service_key: str, bucket: str
+) -> None:
+    """Ladda upp snapshot till Supabase Storage (bucket privat, upsert)."""
+    endpoint = f"{base_url.rstrip('/')}/storage/v1/object/{bucket}/{object_name}"
+    with open(local_path, "rb") as f:
+        resp = requests.post(
+            endpoint,
+            data=f.read(),
+            headers={
+                "Authorization": f"Bearer {service_key}",
+                "Content-Type": "application/json",
+                "x-upsert": "true",
+            },
+            timeout=120,
+        )
+    if resp.status_code not in (200, 201):
+        raise RuntimeError(
+            f"Storage-uppladdning misslyckades ({resp.status_code}): {resp.text[:300]}"
+        )
+    print(f"Uppladdad till Storage: {bucket}/{object_name}")
+
+
+def prune_storage(base_url: str, service_key: str, bucket: str) -> None:
+    """Ta bort objekt äldre än retention (behåll alltid minst 3)."""
+    list_ep = f"{base_url.rstrip('/')}/storage/v1/object/list/{bucket}"
+    resp = requests.post(
+        list_ep,
+        json={"prefix": "", "limit": 1000, "sortBy": {"column": "name", "order": "asc"}},
+        headers={
+            "Authorization": f"Bearer {service_key}",
+            "Content-Type": "application/json",
+        },
+        timeout=60,
+    )
+    resp.raise_for_status()
+    names = [o["name"] for o in resp.json() if o.get("name")]
+    if len(names) <= 3:
+        return
+    cutoff = datetime.now(timezone.utc) - timedelta(days=SNAPSHOT_RETENTION_DAYS)
+    # Behåll de 3 nyaste oavsett ålder; kandidater är resten
+    for name in sorted(names)[:-3]:
+        ts = _parse_ts_from_name(name)
+        if ts is not None and ts < cutoff:
+            del_ep = f"{base_url.rstrip('/')}/storage/v1/object/{bucket}/{name}"
+            d = requests.delete(
+                del_ep, headers={"Authorization": f"Bearer {service_key}"}, timeout=60
+            )
+            if d.status_code in (200, 204):
+                print(f"Tog bort gammalt Storage-objekt: {name}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Skapa aggregat-snapshot (arkiveringskrav)")
     parser.add_argument("--sha", default=None, help="Git SHA (auto-detekteras om saknas)")
@@ -110,6 +175,24 @@ def main() -> int:
             "postgresql://postgres:postgres@127.0.0.1:54322/postgres",
         ),
         help="PostgreSQL-anslutningssträng",
+    )
+    parser.add_argument(
+        "--supabase-url",
+        default=os.getenv("SUPABASE_URL") or os.getenv("NEXT_PUBLIC_SUPABASE_URL"),
+        help="Supabase projekt-URL (för Storage-uppladdning)",
+    )
+    parser.add_argument(
+        "--service-role-key",
+        default=os.getenv("SUPABASE_SERVICE_ROLE_KEY"),
+        help="Service-role-nyckel (för Storage-uppladdning)",
+    )
+    parser.add_argument(
+        "--bucket", default="publication_snapshots", help="Storage-bucket för snapshots"
+    )
+    parser.add_argument(
+        "--no-upload",
+        action="store_true",
+        help="Hoppa över Storage-uppladdning (endast lokal snapshot)",
     )
     args = parser.parse_args()
 
@@ -154,11 +237,27 @@ def main() -> int:
     print(f"Klar. Storlek: {size_mb:.1f} MB")
     print(f"Titlar nationellt: {len(national)}, per arbetsgivare: {len(employer)}")
 
-    # Töm snapshots äldre än 6 månader (men behåll alltid minst 3 filer)
+    # Ladda upp till Supabase Storage (primär arkivlagring enligt utgivningsbevis).
+    # Steget får inte tyst hoppas över: saknas nycklar utan explicit --no-upload → fel.
+    if args.no_upload:
+        print("Storage-uppladdning överhoppad (--no-upload).")
+    elif args.supabase_url and args.service_role_key:
+        upload_to_storage(
+            filename, filename.name, args.supabase_url, args.service_role_key, args.bucket
+        )
+        prune_storage(args.supabase_url, args.service_role_key, args.bucket)
+    else:
+        print(
+            "FEL: Storage-nycklar saknas (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY). "
+            "Ange dem, eller kör med --no-upload om lokal snapshot räcker.",
+            file=sys.stderr,
+        )
+        return 2
+
+    # Töm lokala snapshots äldre än retention (men behåll alltid minst 3 filer)
     all_snaps = sorted(snapshots_dir.glob("*.json"), key=lambda p: p.stat().st_mtime)
     if len(all_snaps) > 3:
-        from datetime import timedelta
-        cutoff = datetime.now(timezone.utc) - timedelta(days=185)  # 6 månader + marginal
+        cutoff = datetime.now(timezone.utc) - timedelta(days=SNAPSHOT_RETENTION_DAYS)
         for old in all_snaps[:-3]:
             mtime = datetime.fromtimestamp(old.stat().st_mtime, tz=timezone.utc)
             if mtime < cutoff:

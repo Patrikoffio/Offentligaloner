@@ -142,6 +142,50 @@ efter migration 0002.
   Kommunövergripande 2 515 → 30. Folkhälsa (ny) 31. Alla 24 kategorier representerade.
   Applicerat till generalized_titles. Sidor rebuiltade: 5 658 sidor, grön.
 
+#### Klart i session 6 – go-live (2026-07-21)
+- **Steg 1 – molnprojekt kopplat.** Supabase eu-north-1, projekt-ref
+  `usiruoserwsymxzmnfeg`. Anslutning sker via session-poolern
+  `aws-0-eu-north-1.pooler.supabase.com:5432` (direkt-hosten är IPv6-only och
+  onåbar från körmiljön/containern). `web/.env.local` pekar på molnet (lokala
+  dev-värden kvar utkommenterade). Migrationer 0001+0002 pushade
+  (`supabase db push --db-url`), historik registrerad.
+- **Data migrerad lokalt → moln** via `pg_dump -Fc --data-only --schema=public`
+  (exkl. matview-data) + `pg_restore --single-transaction`. Verifiering grön:
+  alla 9 bastabeller identiska (salary_records 501 517), title_national_stats
+  2 116 med identiska medianer, title_employer_stats 9 370 bit-för-bit identisk.
+  Enda avvikelse: p90 på 2/2 116 rader skiljer ~1e-10 (double-precision
+  percentile_cont, summeringsordning ändras vid restore) – rundas bort vid
+  visning, ingen datadifferens. Matviews refreshade i molnet efter load.
+- **Steg 2 – snapshot → Supabase Storage.** Privat bucket `publication_snapshots`
+  skapad. `snapshot_archives.py` utökad med `upload_to_storage` + `prune_storage`
+  (6-mån retention, behåller min 3). Steget kan inte tyst hoppas över: saknas
+  SUPABASE_URL/SERVICE_ROLE_KEY utan explicit --no-upload → exit 2. Körd mot
+  molnet: 2 116 nationella + 9 370 per-arbetsgivare, objekt verifierat i bucketen.
+- **Steg 3 – Vercel-deploy.** Projekt `offentligaloner` (team patrikoffio) länkat,
+  rot = `web/`. Env-vars (URL, anon, service-role) satta för preview+production;
+  service-role används endast vid build (generateStaticParams), följer ej med till
+  klient. Deploy grön: 5 658 sidor. Förhandsadress: https://offentligaloner.vercel.app
+  (produktions-alias, publikt 200; hash-baserade deployment-URL:er är SSO-skyddade).
+  Yrkessida verifierad mot molndata + footer (utgivningsbevis nr 2024-077,
+  ansvarig utgivare Patrik Larsson). OBS: vercel.app-aliaset är publikt nåbart –
+  ingen custom domain kopplad än, offentligaloner.se orörd. Footer fanns redan
+  komplett i layout.tsx (renderas på varje sida).
+- **Steg 4 – 200-test.** `pipeline/verify_live_urls.py` (slumpar N slugs ur DB,
+  kräver HTTP 200 utan redirect). 100/100 slugs → 200 mot förhandsadressen.
+- **Steg 5 – färsk Hetzner-dump: PÅGÅR.** Baslinje oktober 2024 fastställd ur
+  `data/dump/20241027_backup_salaries.dump` (temp-restore): salary_salary 501 517,
+  salary_generalizedtitle 9 383. `pipeline/fetch_hetzner_dump.sh` skapad – kör mot
+  gamla servern med interaktivt SSH-lösenord (inga hemligheter i skript/git),
+  upptäcker rätt DB och dumpar till `data/dump/`. Väntar på att dumpen hämtas;
+  därefter jämförs radantal och migreringen körs om vid avvikelse.
+- **Öppna punkter go-live:**
+  - Deployment Protection kan ej aktiveras – Vercel Hobby saknar Vercel
+    Authentication för produktion (kräver Pro). vercel.app-aliaset är därmed
+    publikt tills annat beslut (ta ned produktions-deployen, uppgradera, eller
+    middleware-grind). offentligaloner.se är orörd.
+  - Temp-DB `oct_baseline` + `/tmp/oct.dump` i lokala containern städas när
+    steg 5 är klart.
+
 #### Återstår i 1b
 - Mappningstäckning via AI-klassning (mapping_method='ai', reviewed=false).
 - Go-live-checklista: färsk Hetzner-dump, verifiering grön, snapshot-pipeline kopplad
