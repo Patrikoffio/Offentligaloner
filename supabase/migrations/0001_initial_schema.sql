@@ -210,6 +210,10 @@ create policy "public read generalized_titles" on generalized_titles for select 
 create policy "public read aid_labels"         on aid_labels         for select using (true);
 -- salary_records m.fl.: ingen publik policy → endast service role.
 
+-- Tabellnivå-privilegier: krävs utöver RLS-policyer för Supabase-rollerna.
+grant select on all tables  in schema public to anon, authenticated, service_role;
+grant select on all sequences in schema public to anon, authenticated, service_role;
+
 -- ============================================================
 -- Fas 3: köp
 -- ============================================================
