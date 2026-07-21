@@ -114,27 +114,37 @@ Mediemyndigheten. Detta ger kraven nedan – de är juridiska skyldigheter, inte
 
 ### Fas 1 (klar)
 Dump migrerad till v2-schemat och verifierad grön:
-501 517 rader, 145 arbetsgivare, 5 654 slugs totalt, 2 122 titlar med publicerbar data (n≥5).
+501 517 rader, 145 arbetsgivare, 5 654 slugs totalt, 2 116 titlar med publicerbar data (n≥5)
+efter migration 0002.
 
 ### Fas 1b (pågår)
-Klart i session 3:
-- employment_rate-verifiering: fördelning ren (67 % heltid, 23 % NULL, 0 ogiltiga).
-  505 rader har fulltime-ekvivalent >200 000 kr p.g.a. låg sysselsättningsgrad (10 %);
-  det är korrekt matematik men bör flaggas vid nästa import-omgång.
-  Medianer för 10 stora yrken är rimliga 2024-nivåer (SSK 37 930 kr, lärare 39 700 kr osv).
-- Sidgenerering utökad: generateStaticParams hämtar nu ALLA 5 654 slugs (paginerat,
-  1 000/batch). Titlar utan n≥5-data renderar "ingen publicerbar statistik ännu"-sida
-  i stället för 404.
-- Snapshot-arkivering: `pipeline/snapshot_archives.py` exporterar title_national_stats
-  (2 122 rader) + title_employer_stats (9 411 rader) till JSON med SHA+tidsstämpel.
-  Lokal mapp: snapshots/ (gitignorerad). Supabase Storage-integration planeras vid go-live.
-- Kategorigranskning (session 3): "Kommunövergripande och Strategiska funktioner" är
-  utpräglad catch-all-kategori (2 515 av 5 654 titlar). Flera felklassade titlar noterade
-  (Tvättbiträde, Beroendeterapeut, Ramppersonal m.fl. borde inte vara Kommunövergripande).
-  Omklassning är ett separat jobb; befintliga kategorier bevaras.
 
-Återstår i 1b:
-- Mappningstäckning via AI-klassning (mapping_method='ai', reviewed=false)
+#### Klart i session 3 (2026-07-21)
+- employment_rate-verifiering: fördelning ren (67 % heltid, 23 % NULL, 0 ogiltiga).
+- Sidgenerering: generateStaticParams hämtar ALLA 5 654 slugs (paginerat, 1 000/batch).
+- Snapshot-arkivering: `pipeline/snapshot_archives.py` exporterar nationell statistik
+  (2 116 rader) + per-arbetsgivare (9 411 rader) till JSON med SHA+tidsstämpel.
+
+#### Klart i session 4 (2026-07-21)
+- Migration 0002: employment_rate < 0.25 → monthly_salary_fulltime = NULL.
+  Effekt: Skolläkare p90 373k→185k, Danspedagog 167k→69k, Politisk Sekreterare
+  205k→113k. 6 titlar tappar n≥5-status (2 122→2 116). Materialiserade vyer
+  återskapade med identisk definition.
+- Informationssidor för titlar utan data omgjorda: visar nu kategoristatistik
+  (typisk median inom kategorin), länkar till 3–5 liknande yrken med data,
+  förklaringstext. Next.js-bygget grön: 5 658 sidor genererade utan TS-fel.
+- Kategoriomklassning (uppgift 2): Regelbaserad klassning av alla 5 654 titlar
+  sparad i `pipeline/category_proposals.json`. Förslaget reducerar catch-all
+  "Kommunövergripande" från 2 515→54 titlar men skapar ny catch-all "Ekonomi och
+  Administration" (2 684 titlar). Granskades i 40-urval: ~10 felklassningar noterade
+  (Digital Utvecklare, Plan- och Bygglovsingenjör, Skötare-Outbildad m.fl.).
+  STATUS: VÄNTAR PÅ BESLUT. Ej applicerat till generalized_titles.
+  Klassificeringsskript: `pipeline/classify_categories.py --apply` när godkänt.
+
+#### Återstår i 1b
+- Kategoriomklassning: antingen fixa regler i classify_categories.py och kör om,
+  eller godkänn nuvarande förslag med kända brister.
+- Mappningstäckning via AI-klassning (mapping_method='ai', reviewed=false).
 - Go-live-checklista: färsk Hetzner-dump, verifiering grön, snapshot-pipeline kopplad
   till Supabase Storage, footeruppgifter kontrollerade, 301-redirects testade, DNS-flytt,
   ändringsanmälan Mediemyndigheten, Hetzner uppsagt.

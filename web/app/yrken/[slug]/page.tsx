@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 // ─── Typer ──────────────────────────────────────────────────────────────────
@@ -29,6 +30,7 @@ interface Title {
   category: string | null;
   ai_description: string | null;
   seo_keywords: string[] | null;
+  similar_jobs: string[] | null;
 }
 
 interface SourceInfo {
@@ -37,8 +39,21 @@ interface SourceInfo {
   salary_date: string | null;
 }
 
+interface SimilarJobLink {
+  title: string;
+  slug: string;
+  median: number;
+  n: number;
+}
+
+interface CategoryStats {
+  num_titles: number;
+  total_n: number;
+  median_median: number;
+}
+
 // ─── Statisk generering – ALLA generaliserade titlar ─────────────────────────
-// Titlar utan n>=5-data får en "ingen data ännu"-sida i stället för 404.
+// Titlar utan n>=5-data får en informationssida i stället för 404.
 
 export async function generateStaticParams() {
   const pageSize = 1000;
@@ -110,61 +125,110 @@ export default async function YrkeSida({
 }) {
   const { slug } = await params;
 
-  // Hämta titel
+  // Hämta titel (inkl. similar_jobs för informationssidan)
   const { data: title } = await supabaseAdmin
     .from("generalized_titles")
-    .select("id, title, slug, category, ai_description, seo_keywords")
+    .select("id, title, slug, category, ai_description, seo_keywords, similar_jobs")
     .eq("slug", slug)
     .single<Title>();
 
   if (!title) notFound();
 
-  // Hämta nationell statistik (kan saknas — titlar utan n>=5 data får ingen-data-sida)
+  // Hämta nationell statistik (kan saknas — titlar utan n>=5 data får informationssida)
   const { data: national } = await supabaseAdmin
     .from("title_national_stats")
     .select("n, mean_salary, p10, p25, median, p75, p90, collection_year")
     .eq("generalized_title_id", title.id)
     .single<NationalStats>();
 
-  // Hämta per-arbetsgivare statistik (top 20 per median)
-  const { data: employers } = await supabaseAdmin
-    .rpc("get_employer_stats_for_title", { p_title_id: title.id })
-    .limit(20) as { data: EmployerStat[] | null };
+  // ── Datahämtning för sidor MED statistik ─────────────────────────────────
 
-  // Fallback: hämta employer stats direkt om RPC saknas
-  const { data: employerStatsDirect } = await supabaseAdmin
-    .from("title_employer_stats")
-    .select("employer_id, n, median, mean_salary, employers(name)")
-    .eq("generalized_title_id", title.id)
-    .gte("n", 5)
-    .order("n", { ascending: false })
-    .limit(20);
+  const employerList: EmployerStat[] = [];
+  let sourceList: SourceInfo[] = [];
 
-  const employerList = (employerStatsDirect ?? []).map((r: any) => ({
-    employer_name: r.employers?.name ?? "Okänd",
-    n: r.n,
-    median: r.median,
-    mean_salary: r.mean_salary,
-  }));
+  if (national) {
+    // Hämta per-arbetsgivare statistik
+    const { data: employerStatsDirect } = await supabaseAdmin
+      .from("title_employer_stats")
+      .select("employer_id, n, median, mean_salary, employers(name)")
+      .eq("generalized_title_id", title.id)
+      .gte("n", 5)
+      .order("n", { ascending: false })
+      .limit(20);
 
-  // Hämta källhänvisningar
-  const { data: sources } = await supabaseAdmin
-    .from("source_documents")
-    .select(
-      "received_at, salary_date, collection_requests(employer_id, employers(name))"
-    )
-    .order("salary_date", { ascending: false })
-    .limit(5);
+    employerList.push(
+      ...(employerStatsDirect ?? []).map((r: any) => ({
+        employer_name: r.employers?.name ?? "Okänd",
+        n: r.n,
+        median: r.median,
+        mean_salary: r.mean_salary,
+      }))
+    );
 
-  const sourceList: SourceInfo[] = (sources ?? []).map((s: any) => ({
-    employer_name: s.collection_requests?.employers?.name ?? "Okänd",
-    received_at: s.received_at,
-    salary_date: s.salary_date,
-  }));
+    // Hämta källhänvisningar
+    const { data: sources } = await supabaseAdmin
+      .from("source_documents")
+      .select("received_at, salary_date, collection_requests(employer_id, employers(name))")
+      .order("salary_date", { ascending: false })
+      .limit(5);
+
+    sourceList = (sources ?? []).map((s: any) => ({
+      employer_name: s.collection_requests?.employers?.name ?? "Okänd",
+      received_at: s.received_at,
+      salary_date: s.salary_date,
+    }));
+  }
+
+  // ── Datahämtning för sidor UTAN statistik ────────────────────────────────
+
+  let similarJobLinks: SimilarJobLink[] = [];
+  let categoryStats: CategoryStats | null = null;
+
+  if (!national) {
+    // Similar_jobs med publicerbar data (lookup via titel-namn → slug)
+    if (title.similar_jobs && title.similar_jobs.length > 0) {
+      const { data: similarData } = await supabaseAdmin
+        .from("generalized_titles")
+        .select("title, slug, title_national_stats(n, median)")
+        .in("title", title.similar_jobs)
+        .limit(10);
+
+      similarJobLinks = (similarData ?? [])
+        .filter((r: any) => r.title_national_stats && r.title_national_stats.length > 0)
+        .map((r: any) => ({
+          title: r.title,
+          slug: r.slug,
+          median: r.title_national_stats[0].median,
+          n: r.title_national_stats[0].n,
+        }))
+        .sort((a, b) => b.n - a.n)
+        .slice(0, 5);
+    }
+
+    // Kategoristatistik
+    if (title.category) {
+      const { data: catData } = await supabaseAdmin
+        .from("title_national_stats")
+        .select("median, n, generalized_titles!inner(category)")
+        .eq("generalized_titles.category", title.category);
+
+      if (catData && catData.length > 0) {
+        const medians = (catData as any[]).map((r) => r.median).sort((a, b) => a - b);
+        const mid = Math.floor(medians.length / 2);
+        categoryStats = {
+          num_titles: medians.length,
+          total_n: (catData as any[]).reduce((s, r) => s + r.n, 0),
+          median_median:
+            medians.length % 2 === 0
+              ? Math.round((medians[mid - 1] + medians[mid]) / 2)
+              : Math.round(medians[mid]),
+        };
+      }
+    }
+  }
 
   const year = national?.collection_year ?? 2024;
 
-  // Lönedistribution — percentiler
   const distribution = national
     ? [
         { label: "10:e percentilen", value: national.p10 },
@@ -176,7 +240,6 @@ export default async function YrkeSida({
       ]
     : [];
 
-  // Stapelbredd relativt p90
   const maxVal = national?.p90 ?? 1;
 
   return (
@@ -203,20 +266,91 @@ export default async function YrkeSida({
         <p className="text-gray-600 mb-8 max-w-2xl">{title.ai_description}</p>
       )}
 
-      {/* Ingen data ännu */}
+      {/* ── Informationssida (ingen publicerbar data) ────────────────────── */}
       {!national && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8">
-          <p className="text-gray-700 font-medium mb-1">
-            Ingen publicerbar statistik ännu
-          </p>
-          <p className="text-sm text-gray-500">
-            För att statistik ska visas krävs uppgifter från minst 5 individer
-            med denna titel i vår insamling. Antingen saknas titeln i 2024 års
-            data, eller har den för få förekomster för att publiceras.
-            Statistiken uppdateras när ny data samlas in.
-          </p>
+        <div className="space-y-8">
+          {/* Förklaring */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-5">
+            <p className="font-medium text-amber-900 mb-2">
+              Ingen publicerbar lönestatistik för {title.title} ännu
+            </p>
+            <p className="text-sm text-amber-800">
+              Statistik visas bara när vi har uppgifter från minst 5 individer med samma
+              titel. Det kan bero på att titeln är ovanlig, att den stavades annorlunda
+              i inlämnade filer, eller att den enbart förekom hos arbetsgivare som inte
+              deltog i 2024 års insamling. Nästa datainsamling sker 2026.
+            </p>
+          </div>
+
+          {/* Kategoristatistik */}
+          {title.category && categoryStats && (
+            <section>
+              <h2 className="text-lg font-semibold mb-3">
+                Löner inom {title.category}
+              </h2>
+              <p className="text-sm text-gray-500 mb-4">
+                Baserat på {categoryStats.num_titles.toLocaleString("sv-SE")} yrkestitlar
+                och {categoryStats.total_n.toLocaleString("sv-SE")} anställda i denna
+                kategori i 2024 års data.
+              </p>
+              <div className="bg-gray-50 rounded-lg p-4 inline-block">
+                <p className="text-sm text-gray-500 mb-1">
+                  Typisk medianlön inom kategorin
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {categoryStats.median_median.toLocaleString("sv-SE")} kr/mån
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Medianen av alla titlars medianer i kategorin. Heltidsekvivalent.
+                </p>
+              </div>
+            </section>
+          )}
+
+          {/* Liknande yrken med data */}
+          {similarJobLinks.length > 0 && (
+            <section>
+              <h2 className="text-lg font-semibold mb-3">
+                Liknande yrken med tillgänglig statistik
+              </h2>
+              <ul className="divide-y divide-gray-100 border border-gray-100 rounded-lg overflow-hidden">
+                {similarJobLinks.map((job) => (
+                  <li key={job.slug}>
+                    <Link
+                      href={`/yrken/${job.slug}`}
+                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+                    >
+                      <span className="font-medium text-gray-800">{job.title}</span>
+                      <span className="text-sm text-gray-500 ml-4 shrink-0">
+                        {formatSalary(job.median)} median &middot;{" "}
+                        {job.n.toLocaleString("sv-SE")} anst.
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* Fallback om inga similar_jobs heller */}
+          {similarJobLinks.length === 0 && (
+            <section>
+              <h2 className="text-lg font-semibold mb-3">Utforska fler yrken</h2>
+              <p className="text-sm text-gray-500 mb-3">
+                Bläddra bland yrken med tillgänglig lönestatistik.
+              </p>
+              <Link
+                href="/"
+                className="inline-block bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700"
+              >
+                Tillbaka till startsidan
+              </Link>
+            </section>
+          )}
         </div>
       )}
+
+      {/* ── Sida MED statistik ──────────────────────────────────────────────── */}
 
       {/* Lönedistribution */}
       {national && (
@@ -282,9 +416,7 @@ export default async function YrkeSida({
                     className="border-b border-gray-100 hover:bg-gray-50"
                   >
                     <td className="py-2 pr-4">{e.employer_name}</td>
-                    <td className="py-2 pr-4 text-right text-gray-500">
-                      {e.n}
-                    </td>
+                    <td className="py-2 pr-4 text-right text-gray-500">{e.n}</td>
                     <td className="py-2 pr-4 text-right font-medium">
                       {formatSalary(e.median)}
                     </td>
