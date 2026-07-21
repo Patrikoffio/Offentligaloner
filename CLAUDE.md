@@ -127,23 +127,22 @@ efter migration 0002.
 
 #### Klart i session 4 (2026-07-21)
 - Migration 0002: employment_rate < 0.25 → monthly_salary_fulltime = NULL.
-  Effekt: Skolläkare p90 373k→185k, Danspedagog 167k→69k, Politisk Sekreterare
-  205k→113k. 6 titlar tappar n≥5-status (2 122→2 116). Materialiserade vyer
-  återskapade med identisk definition.
-- Informationssidor för titlar utan data omgjorda: visar nu kategoristatistik
-  (typisk median inom kategorin), länkar till 3–5 liknande yrken med data,
-  förklaringstext. Next.js-bygget grön: 5 658 sidor genererade utan TS-fel.
-- Kategoriomklassning (uppgift 2): Regelbaserad klassning av alla 5 654 titlar
-  sparad i `pipeline/category_proposals.json`. Förslaget reducerar catch-all
-  "Kommunövergripande" från 2 515→54 titlar men skapar ny catch-all "Ekonomi och
-  Administration" (2 684 titlar). Granskades i 40-urval: ~10 felklassningar noterade
-  (Digital Utvecklare, Plan- och Bygglovsingenjör, Skötare-Outbildad m.fl.).
-  STATUS: VÄNTAR PÅ BESLUT. Ej applicerat till generalized_titles.
-  Klassificeringsskript: `pipeline/classify_categories.py --apply` när godkänt.
+  Effekt: Skolläkare p90 373k→185k, Danspedagog 167k→69k. 6 titlar tappar n≥5-status.
+- Informationssidor för titlar utan data: kategoristatistik, 3–5 similar_jobs-länkar,
+  förklaringstext. Bygget grön: 5 658 sidor utan TS-fel.
+
+#### Klart i session 5 (2026-07-21)
+- Kategoriomklassning klar och godkänd. Alla 5 654 titlar semantiskt klassade i
+  de 24 kategorierna från Grupper.txt. Flermanuell granskning: tre stickprov á 30,
+  riktad genomgång av Ekonomi och Administration (1 414→967 efter rättningar),
+  5 manuellt korrigerade gränsfall. Slutlig fördelning:
+    Utbildning och Pedagogik 1 020, Ekonomi och Administration 967,
+    Vård och Omsorg 801, Samhällsbyggnad och Infrastruktur 484,
+    Socialt arbete och Stöd 441, Kultur och Fritid 356, IT och Digitalisering 307.
+  Kommunövergripande 2 515 → 30. Folkhälsa (ny) 31. Alla 24 kategorier representerade.
+  Applicerat till generalized_titles. Sidor rebuiltade: 5 658 sidor, grön.
 
 #### Återstår i 1b
-- Kategoriomklassning: antingen fixa regler i classify_categories.py och kör om,
-  eller godkänn nuvarande förslag med kända brister.
 - Mappningstäckning via AI-klassning (mapping_method='ai', reviewed=false).
 - Go-live-checklista: färsk Hetzner-dump, verifiering grön, snapshot-pipeline kopplad
   till Supabase Storage, footeruppgifter kontrollerade, 301-redirects testade, DNS-flytt,
