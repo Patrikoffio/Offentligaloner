@@ -127,10 +127,16 @@ Mediemyndigheten. Detta ger kraven nedan – de är juridiska skyldigheter, inte
 - **Kategorier:** session-5 återanvänd per slug + 38 flyttar; 8 kvar `category_reviewed=false`.
 - **5 granskningsändringar:** ren ai_description (DB), aggregerad källhänvisning +
   utfällbar lista, datering, uppräknings-scaffold (bakom flagga), n<5-arbetsgivarrader.
+- **Go-live-granskning KLAR** (`pipeline/granskningslista.py`, read-only, 5/5 auto-
+  kontroller gröna). Manuell ögning gav 13 visningsnamn att rätta (obalanserade
+  parenteser, dubbla mellanslag, stavfel Psykatrisk/Adminisrator/Modermal, Kvalité)
+  → `pipeline/fix_title_typos.sql`, applicerat moln + lokalt (13+13). **Endast title,
+  slugs orörda** (slug-hash oförändrad), n<5-underlag intakt. Snapshot arkiverad med
+  rättade titlar (`publication_snapshots`). Steg 1–3 omkörda gröna (skript/200/301).
 
 **Exakt läge nu:**
-- Preview **deployad & Ready** (target=preview, skyddad – senaste `offentligaloner-m65t5dytj`).
-  Nås SSO-inloggad som patrikoffio.
+- Preview **deployad & Ready** (target=preview, skyddad – senaste `offentligaloner-ou8nini21`,
+  deploy8, verifierad target=preview + publikt alias 404). Nås SSO-inloggad som patrikoffio.
 - **Publika aliaset `offentligaloner.vercel.app` = 404** (ej exponerat).
 - **Uppräkningsflaggan `NEXT_PUBLIC_SHOW_PROJECTION_2026` = AV** tills avtalstalen i
   `web/lib/projections.ts` är ifyllda och granskade.
