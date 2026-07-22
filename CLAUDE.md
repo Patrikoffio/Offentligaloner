@@ -172,8 +172,16 @@ VÄRDEN också ändrats (live-sajten städade titlar). Därför full re-migrerin
   alla 416 tidigare saknade → 200**. Redirects **301** (struktur/numrerad/info).
   Footer med utgivningsbevis renderar. (OBS: aliaset är publikt igen efter deploy –
   ta ned inför beslut om go-live-timing, samma som tidigare.)
-- **KVAR (användaren):** gränsfallsgranskning av 417 nya titlars kategorier
-  (173 i Ekonomi, flera felklass). `/tmp` på Hetzner + `diagnos.txt` att städa.
+- **Kategori-gränsfall KLART:** 38 flyttar applicerade (30 säkra + 8 tveksamma med
+  `category_reviewed=false`, migration 0005). Ekonomi 1 110→1 035. Deployad (deploy4),
+  nya kategorier verifierade live (Veterinär→Vård, Parkskötare→Miljö). `diagnos.txt`
+  borttagen.
+- **Vercel-projektet NEDTAGET tills go-live:** `vercel remove` tog bort hela projektet
+  (inte bara deployer), aliaset ger 404. `web/.vercel/project.json` är därmed inaktuell.
+  **Go-live-återsetup:** i `web/`: `vercel link` (nytt projekt) → sätt 3 env-vars
+  (URL/anon/service-role – värdena finns i `web/.env.local`) → `vercel deploy --prod`.
+- **KVAR (användaren):** `/tmp` på Hetzner-servern att städa (fresh-dump + skript);
+  ev. omprövning av de 8 `category_reviewed=false`-titlarna.
 
 #### Klart i session 6 – go-live (2026-07-21, PÅ OKTOBER-DATA – ersatt av re-migreringen ovan)
 - **Steg 1 – molnprojekt kopplat.** Supabase eu-north-1, projekt-ref
