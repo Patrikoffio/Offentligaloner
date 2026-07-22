@@ -364,13 +364,25 @@ def migrate_salary_records(
 
                     monthly = int(sal_month) if sal_month and sal_month > 0 else None
                     hourly  = float(sal_hour) if sal_hour and sal_hour > 0 else None
-                    # employment_grade: lagrat i % (0–100). Konvertera till decimal (0–1).
-                    # Värden > 100 (t.ex. 1000) är sannolikt heltidsangivelse → 1.0
+                    # Tim vs månad blandas ALDRIG: är personen timavlönad (hourly satt)
+                    # nollas månadslönen – ett månadsvärde bredvid timlönen är en
+                    # härledd/uppskattad siffra som inte får hamna i månadsstatistiken.
+                    if hourly is not None:
+                        monthly = None
+                    # employment_grade kan vara lagrat som decimal (0–1, t.ex. 1.0 =
+                    # heltid; färskt format) ELLER som procent (0–100, t.ex. 100 =
+                    # heltid; äldre oktoberformat). Detektera per värde så båda funkar.
+                    #   > 100  → uppenbar heltidsangivelse (t.ex. 1000) → 1.0
+                    #   > 1.5  → procent → /100
+                    #   annars → redan decimal (0–1)
                     if emp_grade and emp_grade > 0:
-                        if emp_grade > 100:
+                        g = float(emp_grade)
+                        if g > 100:
                             emp_rate = 1.0
+                        elif g > 1.5:
+                            emp_rate = round(g / 100, 3)
                         else:
-                            emp_rate = round(float(emp_grade) / 100, 3)
+                            emp_rate = round(g, 3)
                     else:
                         emp_rate = None
 
@@ -390,7 +402,14 @@ def migrate_salary_records(
                         flag = True
                         flag_reason = f"Månadslön {monthly} utanför [15000,200000]"
 
-                    collection_year = row["salary_date"].year if row["salary_date"] else 2024
+                    # collection_year = INSAMLINGSRUNDANS år (härleds ur created_date),
+                    # inte löneperiodens år. Annars hamnar t.ex. Borås-filen (löneperiod
+                    # 2023-03, insamlad 2024-11) felaktigt i en egen 2023-årsbucket.
+                    _cd = row["created_date"]
+                    collection_year = (
+                        _cd.year if _cd
+                        else (row["salary_date"].year if row["salary_date"] else 2024)
+                    )
 
                     batch.append((
                         row["id"],          # legacy_id
