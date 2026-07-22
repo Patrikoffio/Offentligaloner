@@ -163,7 +163,20 @@ kravkälla. Kartlagt (2026-07-22, read-only mot offentligaloner.se):
   filtrera **n≥5** (hård regel 1) och aldrig visa individdata.
 - Okänt utan källkod: exakt Stripe-fulfillment/webhook, success/cancel-URL, hur köpt
   rapport persisteras/hämtas (3 mån), 39 kr vs 119 kr-logik.
-Minimal brygga byggs och stäms av separat (se förslag i sessionslogg). Först därefter:
+**BESLUT (2026-07-22): variant C, härdad.** Krav på bygg-specen (inget byggs före
+godkänd spec):
+- Checkout Session skapas **server-side** (API-route). Success-sidan **verifierar
+  sessionen mot Stripe** (`payment_status=paid`) innan rapport visas och `purchases`-
+  rad skrivs. **Ingen webhook i v1.** Ingen leverans på blott retur-URL.
+- **Tokenserad rapport-URL** (slumpad token, lagrad i `purchases`, **3 mån** giltighet),
+  visas efter köp + skickas till kundens mejl (enklaste transaktionsmejl; kräver det ny
+  tjänst → föreslå och invänta ok).
+- Rapporten byggs **enbart ur matviews (n≥5)**, max **5** valda titlar, med
+  källhänvisning + metodnot i rapporten. Aldrig individdata.
+- **Stripe secret + service-role endast server-side**, aldrig i klientbundeln.
+- **Pris 39 kr oförändrat. Inget abonnemang** i denna iteration.
+Steg 1 (låsa Stripe-detaljer ur Django-källan via ssh) → steg 2 (bygg-spec för
+godkännande). Först därefter:
 
 1. **Omgranskning** av preview: data, yrkessidor, redirects (301), footer med
    utgivningsbevis, källhänvisningar.
