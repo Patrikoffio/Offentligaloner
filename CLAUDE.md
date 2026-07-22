@@ -110,12 +110,55 @@ Mediemyndigheten. Detta ger kraven nedan – de är juridiska skyldigheter, inte
 4. Rådatafiler i `/data` läses, ändras aldrig.
 5. Ingen deploy utan aggregat-snapshot (arkiveringsskyldigheten ovan).
 
-## Status (uppdaterad 2026-07-21)
+## Status (uppdaterad 2026-07-22)
 
-### Fas 1 (klar)
-Dump migrerad till v2-schemat och verifierad grön:
-501 517 rader, 145 arbetsgivare, 5 654 slugs totalt, 2 116 titlar med publicerbar data (n≥5)
-efter migration 0002.
+### ÖGONBLICKSBILD (2026-07-22)
+
+**Klart och verifierat:**
+- **Re-migrering från färsk Hetzner-dump:** 534 293 löneposter (+32 776 mot oktober,
+  13 nya kommuner 2024-11-01, störst Borås 10 696), 5 821 titlar, 156 arbetsgivare.
+  Migrerings-fixar för nya källformatet (employment_grade bråk↔procent, tim/månad,
+  collection_year ur created_date). Migrationer 0001–0006.
+- **Alla kvalitetsgrindar gröna** på nya datan (sentineler, kön K/M/NULL, rate<0.25→
+  fulltime NULL, tim/månad aldrig blandat, 15k–200k-flagg, >200k-flagg).
+- **Moln = lokalt** (median-hash identisk). Snapshot arkiverad.
+- **SEO:** alla 5 817 live-sitemap-slugs täcks (0 saknade); 301-redirects i next.config
+  (numrerade oktober-slugs + info-sidor + `/loner/:slug`→`/yrken/:slug`).
+- **Kategorier:** session-5 återanvänd per slug + 38 flyttar; 8 kvar `category_reviewed=false`.
+- **5 granskningsändringar:** ren ai_description (DB), aggregerad källhänvisning +
+  utfällbar lista, datering, uppräknings-scaffold (bakom flagga), n<5-arbetsgivarrader.
+
+**Exakt läge nu:**
+- Preview **deployad & Ready** (target=preview, skyddad – senaste `offentligaloner-m65t5dytj`).
+  Nås SSO-inloggad som patrikoffio.
+- **Publika aliaset `offentligaloner.vercel.app` = 404** (ej exponerat).
+- **Uppräkningsflaggan `NEXT_PUBLIC_SHOW_PROJECTION_2026` = AV** tills avtalstalen i
+  `web/lib/projections.ts` är ifyllda och granskade.
+- **Vercel-token är kortlivad** → varje ny deploy/promote kräver en FÄRSK token
+  (den förra gick ut mitt i en deploy). Projekt: `prj_E1yb55HDSKzTGxZW9TlirGprl53Q`,
+  team patrikoffio; env-värden finns i `web/.env.local`.
+
+**Kvar hos verksamheten (ej blockerande):** ompröva de 8 `category_reviewed=false`,
+fyll i avtalstal + aktivera uppräkningsflaggan, städa Hetzner `/tmp`.
+
+### GO-LIVE-SEKVENS (steg för steg)
+1. **Omgranskning** av preview: data, yrkessidor, redirects (301), footer med
+   utgivningsbevis, källhänvisningar.
+2. **Promote till production:** `vercel deploy --prod` (med färsk token). Sajten blir
+   publik på *.vercel.app.
+3. **Vercel → Project → Domains:** lägg till `offentligaloner.se` + `www.offentligaloner.se`.
+4. **Loopia DNS:** A-post `@` → **76.76.21.21**; CNAME `www` → **cname.vercel-dns.com**
+   (exakt värde visas i Vercel Domains). Invänta domänverifiering + SSL-utfärdande.
+5. **Ändringsanmälan till Mediemyndigheten:** serverplacering Helsingfors/Hetzner →
+   Stockholm/Vercel (eu-north-1). Utgivningsbevis nr 2024-077.
+6. **Hetzner-karens:** säg upp/släck servern FÖRST efter att DNS pekar rätt, SSL är
+   utfärdat och ändringsanmälan inskickad. Behåll karensperiod (rollback-möjlighet)
+   innan servern faktiskt släcks.
+
+### Fas 1 (klar – siffror uppdaterade efter re-migrering 2026-07-22)
+Dump migrerad till v2-schemat och verifierad grön. **Efter re-migrering från färsk
+dump:** 534 293 rader, 156 arbetsgivare, 5 821 slugs totalt, 2 151 titlar med
+publicerbar data (n≥5). (Oktober-migreringen gav 501 517 / 145 / 5 654 / 2 116.)
 
 ### Fas 1b (pågår)
 
