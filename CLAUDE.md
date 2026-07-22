@@ -280,4 +280,10 @@ vyn exkluderar flaggade rader, tim/månad ej blandat, 5 654 unika slugs, 24 kate
 - **Fas 2:** Full sidgenerering (titel × arbetsgivare), sök, admin för
   collection_requests, insamlingsrunda 2026.
 - **Fas 3:** Stripe: lönerapport 39 kr, förhandlingsunderlag 249 kr, datalicenser.
+  Förhandlingsunderlaget (249 kr) ska:
+  (a) inkludera 2026-estimatet (uppräkning enligt centrala avtal, se
+      `web/lib/projections.ts` + feature-flaggan NEXT_PUBLIC_SHOW_PROJECTION_2026),
+  (b) kunna sammanställa användarens valda yrken × kommuner till en nedladdningsbar
+      PDF (2024 uppmätt + 2026 uppskattad, per vald titel/arbetsgivare, med metodnot
+      och källhänvisning).
 - **Fas 4:** Platsbanken-integration, "Utvald arbetsgivare", myndighetsexpansion.

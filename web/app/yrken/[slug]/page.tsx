@@ -2,6 +2,11 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import {
+  PROJECTION_ENABLED,
+  projectedSalary,
+  PROJECTION_METHOD_NOTE,
+} from "@/lib/projections";
 
 // ─── Typer ──────────────────────────────────────────────────────────────────
 
@@ -37,6 +42,11 @@ interface SourceInfo {
   employer_name: string;
   received_at: string | null;
   salary_date: string | null;
+}
+
+interface SmallEmployer {
+  employer_name: string;
+  n: number;
 }
 
 interface SimilarJobLink {
@@ -116,20 +126,38 @@ function formatDate(dateStr: string | null): string {
   });
 }
 
-// AI-beskrivningarna är lagrade som HTML (<p>…</p>, ofta flera stycken).
-// Normalisera vid rendering (muterar inte det bevarade innehållet): dela i
-// stycken vid </p>, strippa kvarvarande taggar, trimma whitespace.
-function descriptionParagraphs(html: string | null): string[] {
-  if (!html) return [];
-  return html
-    .split(/<\/p\s*>/i)
-    .map((s) => s.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim())
+// ai_description är städad till ren text med tomrad mellan stycken (se
+// pipeline/clean_ai_descriptions.py). Dela i stycken vid tomrad; behåll </p>-
+// och tagg-strippning som skydd ifall otvättat innehåll skulle dyka upp.
+function descriptionParagraphs(text: string | null): string[] {
+  if (!text) return [];
+  return text
+    .split(/(?:<\/p\s*>|\n\s*\n)/i)
+    .map((s) => s.replace(/<[^>]*>/g, "").replace(/[ \t\r]+/g, " ").trim())
     .filter(Boolean);
 }
 
 // Plain text (utan taggar/styckesindelning) – för meta-description.
 function descriptionPlain(html: string | null): string {
   return descriptionParagraphs(html).join(" ");
+}
+
+const SV_MONTHS = ["januari","februari","mars","april","maj","juni","juli",
+  "augusti","september","oktober","november","december"];
+
+// Svenskt månadsintervall ur en lista datum, t.ex. "mars–maj 2024" / "mars 2024".
+function monthRange(dates: (string | null)[]): string {
+  const ds = dates
+    .filter(Boolean)
+    .map((d) => new Date(d as string))
+    .filter((d) => !isNaN(d.getTime()))
+    .sort((a, b) => a.getTime() - b.getTime());
+  if (ds.length === 0) return "";
+  const first = ds[0];
+  const last = ds[ds.length - 1];
+  const m1 = SV_MONTHS[first.getMonth()];
+  const m2 = SV_MONTHS[last.getMonth()];
+  return m1 === m2 ? `${m1} ${last.getFullYear()}` : `${m1}–${m2} ${last.getFullYear()}`;
 }
 
 // ─── Sida ────────────────────────────────────────────────────────────────────
@@ -161,6 +189,7 @@ export default async function YrkeSida({
 
   const employerList: EmployerStat[] = [];
   let sourceList: SourceInfo[] = [];
+  let smallEmployers: SmallEmployer[] = [];
 
   if (national) {
     // Hämta per-arbetsgivare statistik
@@ -181,18 +210,26 @@ export default async function YrkeSida({
       }))
     );
 
-    // Hämta källhänvisningar
-    const { data: sources } = await supabaseAdmin
-      .from("source_documents")
-      .select("received_at, salary_date, collection_requests(employer_id, employers(name))")
-      .order("salary_date", { ascending: false })
-      .limit(5);
+    // Alla arbetsgivare som lämnat ut uppgifter för denna titel (även n<5) –
+    // driver källhänvisningen och n<5-raderna. Inga lönevärden här.
+    const { data: allEmp } = await supabaseAdmin
+      .from("title_employer_all")
+      .select("employer_name, n, received_at, salary_date")
+      .eq("generalized_title_id", title.id)
+      .order("received_at", { ascending: true });
 
-    sourceList = (sources ?? []).map((s: any) => ({
-      employer_name: s.collection_requests?.employers?.name ?? "Okänd",
-      received_at: s.received_at,
-      salary_date: s.salary_date,
+    sourceList = (allEmp ?? []).map((r: any) => ({
+      employer_name: r.employer_name ?? "Okänd",
+      received_at: r.received_at,
+      salary_date: r.salary_date,
     }));
+
+    // Arbetsgivare med för litet underlag för lönestatistik (n<5) – visas med
+    // antal anställda men utan lönesiffror.
+    smallEmployers = (allEmp ?? [])
+      .filter((r: any) => r.n < 5)
+      .map((r: any) => ({ employer_name: r.employer_name ?? "Okänd", n: r.n }))
+      .sort((a: SmallEmployer, b: SmallEmployer) => b.n - a.n);
   }
 
   // ── Datahämtning för sidor UTAN statistik ────────────────────────────────
@@ -257,6 +294,11 @@ export default async function YrkeSida({
     : [];
 
   const maxVal = national?.p90 ?? 1;
+
+  // Månadsintervall för källhänvisningens aggregerade rad (punkt 2)
+  const sourceCitationRange = monthRange(
+    sourceList.map((s) => s.received_at ?? s.salary_date),
+  );
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -378,11 +420,25 @@ export default async function YrkeSida({
           <h2 className="text-xl font-semibold mb-1">
             Löner {year} — {national.n.toLocaleString("sv-SE")} anställda
           </h2>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-500 mb-2">
             Omräknat till heltidslön. Källa:{" "}
             {national.n.toLocaleString("sv-SE")} individer hos{" "}
-            {employerList.length} arbetsgivare.
+            {sourceList.length} arbetsgivare.
           </p>
+
+          {/* Datering (punkt 3) */}
+          <p className="text-xs text-gray-500 mb-4">
+            Statistiken bygger på 2024 års insamling. Nästa rikstäckande insamling
+            inleds i augusti 2026.
+          </p>
+
+          {PROJECTION_ENABLED &&
+            projectedSalary(national.median, title.category) != null && (
+              <p className="text-xs text-gray-500 mb-3">
+                Kolumner: <strong>2024 uppmätt</strong> /{" "}
+                <span className="text-emerald-700">2026 uppskattad enligt centrala avtal</span>.
+              </p>
+            )}
 
           <div className="space-y-3">
             {distribution.map(({ label, value, highlight }) => (
@@ -408,15 +464,29 @@ export default async function YrkeSida({
                   }`}
                 >
                   {formatSalary(value)}
+                  {PROJECTION_ENABLED &&
+                    projectedSalary(value, title.category) != null && (
+                      <span className="block text-xs text-emerald-700">
+                        {formatSalary(projectedSalary(value, title.category))} (2026)
+                      </span>
+                    )}
                 </span>
               </div>
             ))}
           </div>
+
+          {/* Metodnot för uppräkning (punkt 4) – visas bara när flaggan är på */}
+          {PROJECTION_ENABLED &&
+            projectedSalary(national.median, title.category) != null && (
+              <p className="text-xs text-gray-400 mt-3 max-w-2xl">
+                {PROJECTION_METHOD_NOTE}
+              </p>
+            )}
         </section>
       )}
 
       {/* Per arbetsgivare */}
-      {employerList.length > 0 && (
+      {(employerList.length > 0 || smallEmployers.length > 0) && (
         <section className="mb-10">
           <h2 className="text-xl font-semibold mb-4">Per arbetsgivare</h2>
           <div className="overflow-x-auto">
@@ -445,11 +515,27 @@ export default async function YrkeSida({
                     </td>
                   </tr>
                 ))}
+
+                {/* Arbetsgivare med n<5: antal anställda, men inga lönesiffror */}
+                {smallEmployers.map((e) => (
+                  <tr
+                    key={`small-${e.employer_name}`}
+                    className="border-b border-gray-100 text-gray-400"
+                  >
+                    <td className="py-2 pr-4">{e.employer_name}</td>
+                    <td className="py-2 pr-4 text-right">{e.n}</td>
+                    <td className="py-2 text-right italic" colSpan={2}>
+                      Underlag för litet för lönestatistik
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
           <p className="text-xs text-gray-400 mt-2">
-            Visas bara för arbetsgivare med minst 5 anställda i denna titel.
+            Lönesiffror visas endast för arbetsgivare med minst 5 anställda i denna
+            titel. Arbetsgivare med färre visas med antal anställda men utan
+            lönevärden.
           </p>
         </section>
       )}
@@ -457,24 +543,38 @@ export default async function YrkeSida({
       {/* Källhänvisning — hård regel: ska alltid visas */}
       <section className="border-t border-gray-100 pt-6 text-xs text-gray-500">
         <h3 className="font-medium text-gray-700 mb-2">Källhänvisning</h3>
-        <p>
-          Statistiken avser lönedata för år <strong>{year}</strong>, insamlad
-          via offentlighetsprincipen. Arbetsgivarna har lämnat ut uppgifterna
-          på begäran.
-        </p>
-        {sourceList.length > 0 && (
-          <ul className="mt-2 space-y-1">
-            {sourceList.slice(0, 3).map((s, i) => (
-              <li key={i}>
-                {s.employer_name}
-                {s.received_at
-                  ? `, utlämnat ${formatDate(s.received_at)}`
-                  : s.salary_date
-                  ? `, lönedata ${formatDate(s.salary_date)}`
-                  : ""}
-              </li>
-            ))}
-          </ul>
+        {sourceList.length > 0 ? (
+          <>
+            {/* Aggregerad rad (punkt 2) */}
+            <p>
+              Uppgifter utlämnade av <strong>{sourceList.length}</strong> arbetsgivare
+              enligt offentlighetsprincipen
+              {sourceCitationRange ? `, ${sourceCitationRange}` : ` ${year}`}.
+            </p>
+            {/* Utfällbar komplett lista */}
+            <details className="mt-2">
+              <summary className="cursor-pointer hover:text-gray-700">
+                Visa fullständig lista över arbetsgivare ({sourceList.length})
+              </summary>
+              <ul className="mt-2 space-y-1 pl-1">
+                {sourceList.map((s, i) => (
+                  <li key={i}>
+                    {s.employer_name}
+                    {s.received_at
+                      ? `, utlämnat ${formatDate(s.received_at)}`
+                      : s.salary_date
+                      ? `, lönedata ${formatDate(s.salary_date)}`
+                      : ""}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </>
+        ) : (
+          <p>
+            Statistiken avser lönedata för år <strong>{year}</strong>, insamlad
+            via offentlighetsprincipen.
+          </p>
         )}
         <p className="mt-2">
           Individdata visas aldrig — aggregat kräver minst 5 individer.
