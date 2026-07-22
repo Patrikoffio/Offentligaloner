@@ -166,7 +166,14 @@ VÄRDEN också ändrats (live-sajten städade titlar). Därför full re-migrerin
   248 st 301 för retirerade numrerade oktober-slugs (råtitel-mappade) + info-sidor
   + generell `/loner/:slug`→`/yrken/:slug` (explicit statusCode 301). Lokalt
   verifierat via next start: 100/100 slumpade + 60/60 tidigare saknade → 200,
-  redirects 301. Ny snapshot arkiverad. Vercel-deploy + deployed 200-test pågår.
+  redirects 301. Ny snapshot arkiverad.
+- **Deployad och verifierad mot molndata:** Vercel-prod-deploy (5 825 sidor) live på
+  https://offentligaloner.vercel.app. 200-test mot deployen: **100/100 slumpade +
+  alla 416 tidigare saknade → 200**. Redirects **301** (struktur/numrerad/info).
+  Footer med utgivningsbevis renderar. (OBS: aliaset är publikt igen efter deploy –
+  ta ned inför beslut om go-live-timing, samma som tidigare.)
+- **KVAR (användaren):** gränsfallsgranskning av 417 nya titlars kategorier
+  (173 i Ekonomi, flera felklass). `/tmp` på Hetzner + `diagnos.txt` att städa.
 
 #### Klart i session 6 – go-live (2026-07-21, PÅ OKTOBER-DATA – ersatt av re-migreringen ovan)
 - **Steg 1 – molnprojekt kopplat.** Supabase eu-north-1, projekt-ref
