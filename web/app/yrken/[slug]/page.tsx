@@ -94,7 +94,7 @@ export async function generateMetadata({
   return {
     title: `Lön – ${data.title}`,
     description:
-      data.ai_description ??
+      descriptionPlain(data.ai_description) ||
       `Lönestatistik för ${data.title} i kommuner och regioner i Sverige.`,
     keywords: data.seo_keywords ?? undefined,
   };
@@ -114,6 +114,22 @@ function formatDate(dateStr: string | null): string {
     month: "long",
     day: "numeric",
   });
+}
+
+// AI-beskrivningarna är lagrade som HTML (<p>…</p>, ofta flera stycken).
+// Normalisera vid rendering (muterar inte det bevarade innehållet): dela i
+// stycken vid </p>, strippa kvarvarande taggar, trimma whitespace.
+function descriptionParagraphs(html: string | null): string[] {
+  if (!html) return [];
+  return html
+    .split(/<\/p\s*>/i)
+    .map((s) => s.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+}
+
+// Plain text (utan taggar/styckesindelning) – för meta-description.
+function descriptionPlain(html: string | null): string {
+  return descriptionParagraphs(html).join(" ");
 }
 
 // ─── Sida ────────────────────────────────────────────────────────────────────
@@ -262,8 +278,12 @@ export default async function YrkeSida({
       {title.category && (
         <p className="text-sm text-blue-600 mb-4">{title.category}</p>
       )}
-      {title.ai_description && (
-        <p className="text-gray-600 mb-8 max-w-2xl">{title.ai_description}</p>
+      {descriptionParagraphs(title.ai_description).length > 0 && (
+        <div className="text-gray-600 mb-8 max-w-2xl space-y-3">
+          {descriptionParagraphs(title.ai_description).map((para, i) => (
+            <p key={i}>{para}</p>
+          ))}
+        </div>
       )}
 
       {/* ── Informationssida (ingen publicerbar data) ────────────────────── */}
