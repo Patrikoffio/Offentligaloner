@@ -86,11 +86,11 @@ if [ "$HAVE_DOCKER" = 1 ]; then
     | awk 'tolower($0) ~ /postgres|postgis|timescale/ && tolower($0) !~ /exporter|pgbouncer|umami/ {print $1}')
   log "postgres-db-containrar: $(echo $PGCS | tr '\n' ' ')"
   for PGC in $PGCS; do
-    has=$(docker exec "$PGC" sh -c 'PGHOST= PGPORT= psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-$POSTGRES_USER}" -tAc "select to_regclass('"'"'public.salary_salary'"'"') is not null"' 2>/dev/null | tr -d '[:space:]')
+    has=$(docker exec "$PGC" sh -c 'export PGPASSWORD="${POSTGRES_PASSWORD:-}"; psql -U "${POSTGRES_USER:-postgres}" -d "${POSTGRES_DB:-$POSTGRES_USER}" -tAc "select to_regclass('"'"'public.salary_salary'"'"') is not null"' 2>/dev/null | tr -d '[:space:]')
     log "container $PGC → salary_salary? '${has:-<tomt/fel>}'"
     if [ "$has" = "t" ]; then
       log "dumpar $PGC (databas ur \$POSTGRES_DB)…"
-      if docker exec "$PGC" sh -c 'PGHOST= PGPORT= pg_dump -U "${POSTGRES_USER:-postgres}" -Fc "${POSTGRES_DB:-$POSTGRES_USER}"' > "$TMP" 2>"$ERR"; then
+      if docker exec "$PGC" sh -c 'export PGPASSWORD="${POSTGRES_PASSWORD:-}"; pg_dump -U "${POSTGRES_USER:-postgres}" -Fc "${POSTGRES_DB:-$POSTGRES_USER}"' > "$TMP" 2>"$ERR"; then
         dump_ok "docker:$PGC"
       fi
       log "pg_dump-fel: $(head -3 "$ERR" 2>/dev/null)"
