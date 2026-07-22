@@ -189,6 +189,14 @@ VÄRDEN också ändrats (live-sajten städade titlar). Därför full re-migrerin
   `descriptionParagraphs`/`descriptionPlain` i yrkessidan delar i stycken + strippar
   taggar; meta-description som plain text. Övriga fält rena. Omdeployad som äkta
   preview (target=preview, publikt alias fortsatt 404).
+- **Granskningsfynd (5 ändringar) deployade till skyddad preview:** (1) ai_description
+  städad i DB (`clean_ai_descriptions.py`, 5 820 rader moln+lokalt), render delar på
+  tomrad; (2) källhänvisning aggregerad rad + utfällbar lista (matview 0006
+  `title_employer_all`); (3) datering "2024 års insamling / augusti 2026"; (4)
+  uppräkning 2024→2026 bakom feature-flagga `NEXT_PUBLIC_SHOW_PROJECTION_2026` (AV;
+  tal i `web/lib/projections.ts` fylls i separat); (5) n<5-arbetsgivare visas med
+  antal utan lönevärden. Verifierat lokalt + deployat (deploy Ready, target=preview,
+  publikt alias 404). Vercel-token förnyad (förra gick ut mitt i deploy).
 - **KVAR (användaren):** `/tmp` på Hetzner-servern att städa (fresh-dump + skript);
   ev. omprövning av de 8 `category_reviewed=false`-titlarna.
 
