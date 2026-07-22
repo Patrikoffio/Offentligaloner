@@ -176,10 +176,14 @@ VÄRDEN också ändrats (live-sajten städade titlar). Därför full re-migrerin
   `category_reviewed=false`, migration 0005). Ekonomi 1 110→1 035. Deployad (deploy4),
   nya kategorier verifierade live (Veterinär→Vård, Parkskötare→Miljö). `diagnos.txt`
   borttagen.
-- **Vercel-projektet NEDTAGET tills go-live:** `vercel remove` tog bort hela projektet
-  (inte bara deployer), aliaset ger 404. `web/.vercel/project.json` är därmed inaktuell.
-  **Go-live-återsetup:** i `web/`: `vercel link` (nytt projekt) → sätt 3 env-vars
-  (URL/anon/service-role – värdena finns i `web/.env.local`) → `vercel deploy --prod`.
+- **Vercel återuppsatt i förhandsläge (skyddad preview):** nytt projekt
+  `prj_E1yb55HDSKzTGxZW9TlirGprl53Q` (team patrikoffio), 3 env-vars satta för
+  preview+production. Deployad (build grön, samma verifierade data/kod). Det publika
+  production-aliaset `offentligaloner.vercel.app` **borttaget (`vercel alias rm`) →
+  404**; deployen finns kvar och granskas via den **SSO-skyddade** unika adressen
+  (kräver inloggning som patrikoffio). Inget publikt exponerat.
+  **Go-live:** `vercel deploy --prod` (eller `vercel alias set <deploy> offentligaloner.se`)
+  + DNS-flytt. Env-värden finns i `web/.env.local` om projektet behöver återskapas.
 - **KVAR (användaren):** `/tmp` på Hetzner-servern att städa (fresh-dump + skript);
   ev. omprövning av de 8 `category_reviewed=false`-titlarna.
 
