@@ -148,6 +148,23 @@ Mediemyndigheten. Detta ger kraven nedan – de är juridiska skyldigheter, inte
 fyll i avtalstal + aktivera uppräkningsflaggan, städa Hetzner `/tmp`.
 
 ### GO-LIVE-SEKVENS (steg för steg)
+
+**0. BLOCKERANDE – RAPPORTBRYGGA (nytt, före promote/DNS):**
+Gamla sajten har ett aktivt **betalt rapportflöde som genererar intäkter idag** och
+saknas i v2. Go-live är PAUSAD tills v2 har en minimal motsvarighet. Gamla flödet är
+kravkälla. Kartlagt (2026-07-22, read-only mot offentligaloner.se):
+- Ingång: yrkessidor `/loner/<slug>`, checkboxar → välj upp till 5 befattningar,
+  val i `sessionStorage._x_selected_titles` (Alpine.js).
+- CTA "Jag är nyfiken!": htmx `hx-post /create-checkout-session/` → **Stripe Checkout**.
+- Pris: **39 kr/rapport** (engångs), **119 kr/månad** (abonnemang). Rapport giltig 3 mån.
+- Leverans: HTML-"LÖNERAPPORT" (allmänt, antal, lönespridning för valda befattningar);
+  `/exempel-rapport/` = demo. `/rapport` ger 404 (levereras via genererad URL efter köp).
+- ⚠️ Gamla exempelrapporten visar **n<5** (n=1,2,3,4 med medianer) → v2-bryggan MÅSTE
+  filtrera **n≥5** (hård regel 1) och aldrig visa individdata.
+- Okänt utan källkod: exakt Stripe-fulfillment/webhook, success/cancel-URL, hur köpt
+  rapport persisteras/hämtas (3 mån), 39 kr vs 119 kr-logik.
+Minimal brygga byggs och stäms av separat (se förslag i sessionslogg). Först därefter:
+
 1. **Omgranskning** av preview: data, yrkessidor, redirects (301), footer med
    utgivningsbevis, källhänvisningar.
 2. **Promote till production:** `vercel deploy --prod` (med färsk token). Sajten blir
