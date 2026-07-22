@@ -142,7 +142,33 @@ efter migration 0002.
   Kommunövergripande 2 515 → 30. Folkhälsa (ny) 31. Alla 24 kategorier representerade.
   Applicerat till generalized_titles. Sidor rebuiltade: 5 658 sidor, grön.
 
-#### Klart i session 6 – go-live (2026-07-21)
+#### Session 6 – RE-MIGRERING från färsk dump (2026-07-22)
+Färska Hetzner-dumpen visade sig ha **534 293 löneposter (+32 776)** och **9 778
+titlar (+395)** – data importerades efter oktober (13 nya kommuner 2024-11-01,
+störst Borås 10 696). Radantalsjämförelsen i steg 5 fångade inte att slug/titel-
+VÄRDEN också ändrats (live-sajten städade titlar). Därför full re-migrering:
+- Django-appen kör Docker Swarm; db-containern lyssnar på **PGPORT 5454**, användaren
+  ligger i Docker-secret `/run/secrets/POSTGRE_USER`, pg_hba `local=trust`.
+  `dump_on_server.sh` byggd deterministiskt kring detta (efter iterativ serverdiagnos).
+- `migrate_dump.py`-fixar för nya källformatet: employment_grade är nu **bråk**
+  (1.0=heltid) inte procent → formatdetektering (annars blev all fulltime NULL);
+  tim vs månad blandas aldrig (hourly satt → monthly NULL, 3 047 timavlönade);
+  collection_year ur created_date (insamlingsrunda) → Borås i 2024 inte egen 2023.
+- Migration **0003** (återkalla anon/authenticated-grants) + **0004** (slopa
+  UNIQUE(title) – flera slugs kan dela visningsnamn). Båda i moln + lokalt.
+- Kategorier: regelbaserad baseline + **överlagring av session-5:s granskade
+  kategorier ur molnet per slug** (5 404 återanvända). 417 genuint nya på
+  regelbaserad – 173 i Ekonomi, många felklass (3D-Utvecklare→IT, Ambulanspersonal
+  →Vård, Badmästare→Kultur…). **Gränsfallsgranskning kvar (användaren).**
+- B (received_at) + C (>200k-flagg) omkörda. Verifiering grön: moln = lokalt
+  (534 293 / 5 821 / national 2 151 / employer 9 815), median-hash identisk.
+- **SEO: alla 5 817 live-sitemap-slugs täcks nu av v2 (0 saknade).** next.config:
+  248 st 301 för retirerade numrerade oktober-slugs (råtitel-mappade) + info-sidor
+  + generell `/loner/:slug`→`/yrken/:slug` (explicit statusCode 301). Lokalt
+  verifierat via next start: 100/100 slumpade + 60/60 tidigare saknade → 200,
+  redirects 301. Ny snapshot arkiverad. Vercel-deploy + deployed 200-test pågår.
+
+#### Klart i session 6 – go-live (2026-07-21, PÅ OKTOBER-DATA – ersatt av re-migreringen ovan)
 - **Steg 1 – molnprojekt kopplat.** Supabase eu-north-1, projekt-ref
   `usiruoserwsymxzmnfeg`. Anslutning sker via session-poolern
   `aws-0-eu-north-1.pooler.supabase.com:5432` (direkt-hosten är IPv6-only och
