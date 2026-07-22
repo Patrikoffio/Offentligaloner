@@ -184,6 +184,11 @@ VÄRDEN också ändrats (live-sajten städade titlar). Därför full re-migrerin
   (kräver inloggning som patrikoffio). Inget publikt exponerat.
   **Go-live:** `vercel deploy --prod` (eller `vercel alias set <deploy> offentligaloner.se`)
   + DNS-flytt. Env-värden finns i `web/.env.local` om projektet behöver återskapas.
+- **Fix ai_description-rendering:** beskrivningarna är lagrade som HTML (`<p>…</p>`)
+  och renderades som råtext (taggar syntes). Åtgärdat vid rendering (ej datamutation):
+  `descriptionParagraphs`/`descriptionPlain` i yrkessidan delar i stycken + strippar
+  taggar; meta-description som plain text. Övriga fält rena. Omdeployad som äkta
+  preview (target=preview, publikt alias fortsatt 404).
 - **KVAR (användaren):** `/tmp` på Hetzner-servern att städa (fresh-dump + skript);
   ev. omprövning av de 8 `category_reviewed=false`-titlarna.
 
