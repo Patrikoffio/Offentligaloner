@@ -145,19 +145,33 @@ verifierad end-to-end mot lokala Supabase-stacken (identisk data som molnet):
   **Molnets purchases:** en strandad TEST-rad (id 2, `cs_test_…`, 17:04) från ett
   testköp när dev pekade på molnet – ska raderas så prod-purchases börjar på 0
   (avvaktar bekräftelse). Övriga testrader finns bara lokalt.
-- **PROMOTE IKVÄLL (2026-07-23):** moln-env satt i Production scope (sk_live,
+- **PRODUKTION LIVE + SKARPT BETALFLÖDE VERIFIERAT (2026-07-23):**
+  Deployad till prod på **`https://offentligaloner.vercel.app`** (`target: production`,
+  READY, alias satt, startsida/yrkessidor 200). 8 env i Production scope (sk_live,
   prod-whsec, Postmark, prod-price `price_1QGSQ3…`, `NEXT_PUBLIC_SITE_URL=
-  https://offentligaloner.vercel.app`, Supabase ×3). Prod-webhook registrerad mot
+  https://offentligaloner.vercel.app`, Supabase ×3). Prod-webhook mot
   `https://offentligaloner.vercel.app/api/stripe-webhook` (API 2024-06-20, tre
-  checkout-event). `vercel deploy --prod` körd. Slutverifiering: ett skarpt 39 kr-köp
-  (eget kort) → webhook 200, purchases-rad, mejl, token-rapport. **DNS rörs EJ ikväll**
-  (.se pekar på Hetzner tills imorgon).
-- **MORGONDAGENS LISTA (efter DNS-flytt .se → Vercel):**
-  1. Ändra `NEXT_PUBLIC_SITE_URL` → `https://offentligaloner.se` (Production) + **redeploy**
+  checkout-event). **Skarpt 39 kr-köp (eget kort, `cs_live_`) verifierat helt:**
+  webhook **200** i Stripe-dashboarden → **paid-rad i molnet** (id 3, Undersköterska ×
+  Halmstad, token, 92 dgr, behålls som verifieringsköp) → **token-rapport renderar på
+  prod** (ingen individdata) → **Postmark-mejl med rapportlänk mottaget**.
+  Kodfix: lat Stripe-klient (`getStripe()`/`stripePriceId()`) – bygget kraschade annars
+  utan runtime-secret. **DNS orört ikväll** (.se → Hetzner tills imorgon).
+- **MORGONDAGENS LISTA (go-live, kör i ordning):**
+  1. **DNS hos Loopia:** A `@` → `76.76.21.21`, CNAME `www` → `cname.vercel-dns.com`
+     (exakt värde i Vercel → Domains). Lägg till `offentligaloner.se` + `www` i Vercel.
+  2. Invänta **domänverifiering + SSL-utfärdande**.
+  3. `NEXT_PUBLIC_SITE_URL` → `https://offentligaloner.se` (Production) + **redeploy**
      (annars bygger token-länkar/mejl fortsatt på vercel.app-aliaset).
-  2. Vercel-deploytoken från ikväll (`vcp_…`, giltig 1 dag) **revokeras** (eller löper ut själv).
-  3. Resten av GO-LIVE-SEKVENS: DNS (Loopia), SSL, ändringsanmälan Mediemyndigheten,
-     Hetzner-karens. vercel.app-webhook-endpointen består efter DNS (behöver ej göras om).
+  4. **Sitemap + Google Search Console:** verifiera domän, skicka in sitemap.
+  5. **Ändringsanmälan till Mediemyndigheten** (serverplacering Helsingfors/Hetzner →
+     Stockholm/Vercel eu-north-1). Utgivningsbevis nr 2024-077.
+  6. **Inaktivera gamla Django-webhooken** (`/webhooks/stripe/` på gamla sajten) så inte
+     två system svarar på samma Stripe-event. v2-webhooken (vercel.app-endpointen)
+     består efter DNS – behöver ej göras om.
+  7. **Revoka golive-deploytoken** (`vcp_…`, giltig 1 dag) – eller låt den löpa ut.
+  8. **Hetzner-karens:** släck servern först efter DNS/SSL klart + ändringsanmälan
+     inskickad; behåll karensperiod för rollback.
 
 ### ÖGONBLICKSBILD (2026-07-22)
 
