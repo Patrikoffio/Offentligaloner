@@ -184,11 +184,12 @@ Ordagrant enligt beställning (2026-07-23):
 > (delta mot riksmedian i %), infobox 'Så använder du rapporten i din
 > löneförhandling' (förankra i median, 75:e percentilen som mål vid erfarenhet,
 > poängtera faktiska utbetalda löner enligt offentlighetsprincipen – ej enkätdata),
-> aktiva sektionsrubriker ('Så ligger lönerna i hela landet').
+> aktiva sektionsrubriker ('Så ligger lönerna i hela landet'). Ren rendering/
+> print-CSS + beräkningar på befintlig data – inga schemaändringar, n≥5 orört.
 
-_[Sista punkten i inmatningen ("Ren rendering/print-CSS +…") blev avklippt och
-kompletteras när resten kommer. Ingen uppräkning här – 2026-indexuppräkning hör
-till 249 kr-produkten, se produkttrappan.]_
+_[Ingen uppräkning här – 2026-indexuppräkning hör till 249 kr-produkten, se
+produkttrappan. Endast rendering/print-CSS + härledda nyckeltal ur befintliga
+matviews; inga schemaändringar, n≥5-grinden orörd.]_
 
 ### ÖGONBLICKSBILD (2026-07-22)
 
