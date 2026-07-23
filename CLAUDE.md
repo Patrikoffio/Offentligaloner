@@ -110,7 +110,37 @@ Mediemyndigheten. Detta ger kraven nedan – de är juridiska skyldigheter, inte
 4. Rådatafiler i `/data` läses, ändras aldrig.
 5. Ingen deploy utan aggregat-snapshot (arkiveringsskyldigheten ovan).
 
-## Status (uppdaterad 2026-07-22)
+## Status (uppdaterad 2026-07-23)
+
+### RAPPORTBRYGGAN – BYGGD OCH LOKALT TESTAD GRÖN (2026-07-23)
+
+Variant C (härdad, leveransrobust) enligt bygg-specen nedan. Byggd i web/ och
+verifierad end-to-end mot lokala Supabase-stacken (identisk data som molnet):
+
+- **Migrationer:** `0007` (purchases: report_token/selected_slugs/status/expires_at +
+  idempotens-index på stripe_session), `0008` (`selected_employers bigint[]`),
+  `0009` (grant select/insert/update på purchases till service_role; revoke från
+  anon/authenticated – purchases bär kund-PII). **0008+0009 ännu EJ i molnet** – se
+  go-live-steg 0b (blockerande).
+- **Kod:** webhook `/api/stripe-webhook` (sanningskälla, signaturverifierad, idempotent
+  på stripe_session, hanterar card-sync + Klarna-async), `/api/checkout` (server-side,
+  1–5 yrken × 1–5 arbetsgivare, n≥5-grind), `/api/search/titles`, `/api/report/resend`
+  (rate-limitad, generiskt svar), `/api/report-status`; sidor `/rapport/[token]`,
+  `/rapport/skapad`, `/rapport/avbruten`, `/rapport/skicka-igen`; beställnings-UI på
+  yrkessidan (tvåstegs chips + autocomplete + kontaktrad). Mejl via Postmark
+  (no-reply@offentligaloner.se), `lib/{stripe,site,email,report,ratelimit}.ts`.
+- **Produktavgränsning (låst):** 39 kr = max 5 yrken × max 5 kommuner/regioner.
+  Rapport = nationell spridning (referens) + tabellrader ENDAST för valda arbetsgivare
+  (n≥5). Se produkttrappan under Faser (249 kr = hela landet + percentiler + uppräkning
+  fas 3; offert/B2B fas 4).
+- **Testköp (ENDAST LOKALT):** kort (4242) + Klarna, båda gröna – webhook 200,
+  paid-rad korrekt (slugs+employers+token, giltig 92 dgr), token-rapport renderar rätt
+  medianer, n≥5-filter håller, Postmark-mejl levererat externt (ej sandbox).
+  Async-vägen (pending→async_payment_succeeded) + idempotens (dubbelleverans) bevisad.
+  PII-skydd: anon läser purchases → 42501, skriver → 401. Granskningsskript 5/5.
+  **Molnets purchases orört (0 rader) – testrader finns bara lokalt.**
+- **Kvar (go-live):** 0008+0009 i molnet + moln-env, prod-Stripe-nycklar, skarp
+  webhook-registrering, promote. Se GO-LIVE-SEKVENS steg 0b + 1.
 
 ### ÖGONBLICKSBILD (2026-07-22)
 
@@ -257,8 +287,23 @@ aktiveringsmejl som gamla flödet).
 
 Först därefter (efter godkänd+byggd rapportbrygga):
 
+0b. **BLOCKERANDE – rapportbryggans migrationer i MOLNET (före preview-test/promote):**
+   Rapportbryggan är byggd och verifierad grön LOKALT (2026-07-23: kort- + Klarna-
+   testköp, async/idempotens, PII-skydd, granskningsskript 5/5). Molnet saknar ännu
+   `purchases`-migrationerna. Applicera med SAMMA SQL som lokalt, bekräfta kolumnerna
+   och att moln-`purchases` fortfarande har 0 rader:
+   - **0008** `alter table purchases add column if not exists selected_employers bigint[];`
+   - **0009** `revoke all privileges on table purchases from anon, authenticated;`
+     `grant select, insert, update on table purchases to service_role;`
+     (utan 0009 får webhooken "permission denied" – service_role saknade skrivrätt;
+     0009 härdar dessutom purchases mot anon/authenticated eftersom det bär kund-PII.)
+   Sätt även molnets env: `STRIPE_SECRET_KEY` (prod sk_live), `STRIPE_WEBHOOK_SECRET`
+   (prod, efter endpoint-registrering i Stripe), `STRIPE_PRICE_ID=price_1QGSQ3…`,
+   `POSTMARK_SERVER_TOKEN`, `POSTMARK_FROM`, `NEXT_PUBLIC_SITE_URL=https://offentligaloner.se`.
+
 1. **Omgranskning** av preview: data, yrkessidor, redirects (301), footer med
-   utgivningsbevis, källhänvisningar.
+   utgivningsbevis, källhänvisningar, **rapportflödet** (beställnings-UI, checkout,
+   webhook-leverans, token-rapport, skicka-igen).
 2. **Promote till production:** `vercel deploy --prod` (med färsk token). Sajten blir
    publik på *.vercel.app.
 3. **Vercel → Project → Domains:** lägg till `offentligaloner.se` + `www.offentligaloner.se`.
@@ -445,11 +490,22 @@ vyn exkluderar flaggade rader, tim/månad ej blandat, 5 654 unika slugs, 24 kate
   uppsagd först därefter.
 - **Fas 2:** Full sidgenerering (titel × arbetsgivare), sök, admin för
   collection_requests, insamlingsrunda 2026.
-- **Fas 3:** Stripe: lönerapport 39 kr, förhandlingsunderlag 249 kr, datalicenser.
-  Förhandlingsunderlaget (249 kr) ska:
-  (a) inkludera 2026-estimatet (uppräkning enligt centrala avtal, se
-      `web/lib/projections.ts` + feature-flaggan NEXT_PUBLIC_SHOW_PROJECTION_2026),
-  (b) kunna sammanställa användarens valda yrken × kommuner till en nedladdningsbar
-      PDF (2024 uppmätt + 2026 uppskattad, per vald titel/arbetsgivare, med metodnot
-      och källhänvisning).
-- **Fas 4:** Platsbanken-integration, "Utvald arbetsgivare", myndighetsexpansion.
+### PRODUKTTRAPPA (låst avgränsning)
+
+Tre nivåer, tydligt åtskilda så 39 kr-rapporten inte kannibaliserar de dyrare:
+
+- **39 kr – Lönerapport (byggd, rapportbryggan):** avgränsad till **max 5 yrken ×
+  max 5 valda kommuner/regioner** (min 1 vardera). Innehåll: per yrke nationell
+  lönespridning som referens + tabellrader ENDAST för de valda arbetsgivarna
+  (n≥5-regeln oförändrad). Ingen uppräkning, inga fullständiga uttag. Tokenserad,
+  giltig 3 mån. Diskret kontaktrad i beställnings-UI:t för behov utanför trappan.
+- **249 kr – Förhandlingsunderlag (fas 3):** **hela landet** (alla arbetsgivare, inte
+  bara 5) + fulla **percentiler** + **2026-uppräkning** enligt centrala avtal
+  (`web/lib/projections.ts` + flaggan NEXT_PUBLIC_SHOW_PROJECTION_2026). Nedladdningsbar
+  PDF: valda yrken × kommuner, 2024 uppmätt + 2026 uppskattad, per titel/arbetsgivare,
+  med metodnot och källhänvisning.
+- **Offert / B2B (fas 4):** fullständiga datauttag, datalicenser, "Utvald arbetsgivare",
+  myndighetsexpansion, Platsbanken-integration. Hanteras som offert, inte självbetjäning.
+
+- **Fas 3:** Stripe: förhandlingsunderlag 249 kr (se produkttrappan ovan), datalicenser.
+- **Fas 4:** Offert/B2B, Platsbanken-integration, "Utvald arbetsgivare", myndighetsexpansion.

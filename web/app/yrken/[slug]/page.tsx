@@ -7,6 +7,11 @@ import {
   projectedSalary,
   PROJECTION_METHOD_NOTE,
 } from "@/lib/projections";
+import OrderReport, {
+  ContactLine,
+  type TitleOption,
+  type EmployerOption,
+} from "./OrderReport";
 
 // ─── Typer ──────────────────────────────────────────────────────────────────
 
@@ -190,6 +195,8 @@ export default async function YrkeSida({
   const employerList: EmployerStat[] = [];
   let sourceList: SourceInfo[] = [];
   let smallEmployers: SmallEmployer[] = [];
+  let orderCandidates: TitleOption[] = [];
+  let allEmployers: EmployerOption[] = [];
 
   if (national) {
     // Hämta per-arbetsgivare statistik
@@ -230,6 +237,34 @@ export default async function YrkeSida({
       .filter((r: any) => r.n < 5)
       .map((r: any) => ({ employer_name: r.employer_name ?? "Okänd", n: r.n }))
       .sort((a: SmallEmployer, b: SmallEmployer) => b.n - a.n);
+
+    // Kandidater till rapportbeställningen: aktuell titel + syskon i samma
+    // kategori som har publicerbar statistik (n≥5). Endast titlar med data –
+    // rapporten byggs ur matviews.
+    orderCandidates = [{ slug: title.slug, title: title.title }];
+    if (title.category) {
+      const { data: siblings } = await supabaseAdmin
+        .from("title_national_stats")
+        .select("n, generalized_titles!inner(title, slug, category)")
+        .eq("generalized_titles.category", title.category)
+        .order("n", { ascending: false })
+        .limit(12);
+
+      for (const row of (siblings ?? []) as any[]) {
+        const gt = row.generalized_titles;
+        if (!gt || gt.slug === title.slug) continue;
+        if (orderCandidates.some((c) => c.slug === gt.slug)) continue;
+        orderCandidates.push({ slug: gt.slug, title: gt.title });
+        if (orderCandidates.length >= 8) break;
+      }
+    }
+
+    // Arbetsgivarlista för kommun/region-autocomplete (alla, klientfiltreras).
+    const { data: empData } = await supabaseAdmin
+      .from("employers")
+      .select("id, name")
+      .order("name", { ascending: true });
+    allEmployers = (empData ?? []).map((e: any) => ({ id: e.id, name: e.name }));
   }
 
   // ── Datahämtning för sidor UTAN statistik ────────────────────────────────
@@ -483,6 +518,19 @@ export default async function YrkeSida({
               </p>
             )}
         </section>
+      )}
+
+      {/* Beställ lönerapport – endast på sidor med publicerbar statistik */}
+      {national && (
+        <>
+          <OrderReport
+            defaultSlug={title.slug}
+            defaultTitle={title.title}
+            titleCandidates={orderCandidates}
+            employers={allEmployers}
+          />
+          <ContactLine />
+        </>
       )}
 
       {/* Per arbetsgivare */}
