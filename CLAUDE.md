@@ -173,6 +173,23 @@ verifierad end-to-end mot lokala Supabase-stacken (identisk data som molnet):
   8. **Hetzner-karens:** släck servern först efter DNS/SSL klart + ändringsanmälan
      inskickad; behåll karensperiod för rollback.
 
+### POST-LAUNCH VECKA 1 (hög prio) – rapport-polish
+
+Ordagrant enligt beställning (2026-07-23):
+
+> Rapport-polish: (a) utseende – percentiler som staplar i print, dokumenthuvud
+> med ordmärke/LÖNERAPPORT, luft mellan sektioner, diskret accentfärg på nyckeltal,
+> zebrarand i arbetsgivartabellen, dölj webbläsarens URL/tidsstämpel vid utskrift
+> via print-CSS; (b) förhandlingsvärde – 'Din position'-rad per vald arbetsgivare
+> (delta mot riksmedian i %), infobox 'Så använder du rapporten i din
+> löneförhandling' (förankra i median, 75:e percentilen som mål vid erfarenhet,
+> poängtera faktiska utbetalda löner enligt offentlighetsprincipen – ej enkätdata),
+> aktiva sektionsrubriker ('Så ligger lönerna i hela landet').
+
+_[Sista punkten i inmatningen ("Ren rendering/print-CSS +…") blev avklippt och
+kompletteras när resten kommer. Ingen uppräkning här – 2026-indexuppräkning hör
+till 249 kr-produkten, se produkttrappan.]_
+
 ### ÖGONBLICKSBILD (2026-07-22)
 
 **Klart och verifierat:**
@@ -527,10 +544,22 @@ Tre nivåer, tydligt åtskilda så 39 kr-rapporten inte kannibaliserar de dyrare
   (n≥5-regeln oförändrad). Ingen uppräkning, inga fullständiga uttag. Tokenserad,
   giltig 3 mån. Diskret kontaktrad i beställnings-UI:t för behov utanför trappan.
 - **249 kr – Förhandlingsunderlag (fas 3):** **hela landet** (alla arbetsgivare, inte
-  bara 5) + fulla **percentiler** + **2026-uppräkning** enligt centrala avtal
-  (`web/lib/projections.ts` + flaggan NEXT_PUBLIC_SHOW_PROJECTION_2026). Nedladdningsbar
-  PDF: valda yrken × kommuner, 2024 uppmätt + 2026 uppskattad, per titel/arbetsgivare,
-  med metodnot och källhänvisning.
+  bara 5) + fulla **percentiler**. **KÄRNFUNKTIONEN är 2026-indexuppräkningen** enligt
+  centrala avtal (`web/lib/projections.ts` + flaggan NEXT_PUBLIC_SHOW_PROJECTION_2026) –
+  det är det som motiverar priset. Nedladdningsbar PDF: valda yrken × kommuner, 2024
+  uppmätt + 2026 uppskattad, per titel/arbetsgivare, med metodnot och källhänvisning.
+  **Grindar innan flaggan slås på (alla tre måste vara gröna):**
+  1. **Avtalstal ifyllda och källbelagda** per avtalsområde i `web/lib/projections.ts`
+     (`AGREEMENT_INCREASE`) – varje procenttal ska ha en angiven källa (avtalstext/datum).
+  2. **Granskad mappning yrke → avtalsområde** (`CATEGORY_TO_AGREEMENT`): Kommunal,
+     Vårdförbundet, Vision m.fl. har **olika avtal och olika revisionsdatum** – mappningen
+     måste stämmas av mot rätt avtalsområde per yrke/kategori, inte schabloniseras.
+  3. **Presenteras ALLTID som uppskattning med avtalskälla, aldrig som faktisk lön** –
+     i både PDF-rapporten och på sajten. Formuleringen ska vara otvetydig (uppskattat
+     värde enligt centralt avtal X, revision Y), så det aldrig läses som uppmätt lön.
+  **Teaser-not:** överväg att visa en **uppräknad median som teaser i 39 kr-rapporten
+  FÖRST när 249-produkten finns och är live** – annars kannibaliseras trappan (39-kr
+  ger då bort kärnvärdet i 249-kr gratis).
 - **Offert / B2B (fas 4):** fullständiga datauttag, datalicenser, "Utvald arbetsgivare",
   myndighetsexpansion, Platsbanken-integration. Hanteras som offert, inte självbetjäning.
 
