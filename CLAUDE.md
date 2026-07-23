@@ -120,8 +120,11 @@ verifierad end-to-end mot lokala Supabase-stacken (identisk data som molnet):
 - **Migrationer:** `0007` (purchases: report_token/selected_slugs/status/expires_at +
   idempotens-index på stripe_session), `0008` (`selected_employers bigint[]`),
   `0009` (grant select/insert/update på purchases till service_role; revoke från
-  anon/authenticated – purchases bär kund-PII). **0008+0009 ännu EJ i molnet** – se
-  go-live-steg 0b (blockerande).
+  anon/authenticated – purchases bär kund-PII). **0008+0009 applicerade i MOLNET
+  2026-07-23** (`supabase db push`, historik registrerad). OBS moln: service_role
+  hade redan full DML via Supabase default-privilegier (permission-buggen var
+  lokal-only); anon/authenticated hade FULL DML på purchases i molnet → 0009:s revoke
+  var kritisk PII-härdning där (verifierat: anon läser purchases → 42501).
 - **Kod:** webhook `/api/stripe-webhook` (sanningskälla, signaturverifierad, idempotent
   på stripe_session, hanterar card-sync + Klarna-async), `/api/checkout` (server-side,
   1–5 yrken × 1–5 arbetsgivare, n≥5-grind), `/api/search/titles`, `/api/report/resend`
@@ -137,8 +140,11 @@ verifierad end-to-end mot lokala Supabase-stacken (identisk data som molnet):
   paid-rad korrekt (slugs+employers+token, giltig 92 dgr), token-rapport renderar rätt
   medianer, n≥5-filter håller, Postmark-mejl levererat externt (ej sandbox).
   Async-vägen (pending→async_payment_succeeded) + idempotens (dubbelleverans) bevisad.
-  PII-skydd: anon läser purchases → 42501, skriver → 401. Granskningsskript 5/5.
-  **Molnets purchases orört (0 rader) – testrader finns bara lokalt.**
+  PII-skydd: anon läser purchases → 42501, skriver → 401. Granskningsskript 5/5
+  (lokalt OCH mot molnet efter migreringen).
+  **Molnets purchases:** en strandad TEST-rad (id 2, `cs_test_…`, 17:04) från ett
+  testköp när dev pekade på molnet – ska raderas så prod-purchases börjar på 0
+  (avvaktar bekräftelse). Övriga testrader finns bara lokalt.
 - **Kvar (go-live):** 0008+0009 i molnet + moln-env, prod-Stripe-nycklar, skarp
   webhook-registrering, promote. Se GO-LIVE-SEKVENS steg 0b + 1.
 
@@ -287,17 +293,13 @@ aktiveringsmejl som gamla flödet).
 
 Först därefter (efter godkänd+byggd rapportbrygga):
 
-0b. **BLOCKERANDE – rapportbryggans migrationer i MOLNET (före preview-test/promote):**
-   Rapportbryggan är byggd och verifierad grön LOKALT (2026-07-23: kort- + Klarna-
-   testköp, async/idempotens, PII-skydd, granskningsskript 5/5). Molnet saknar ännu
-   `purchases`-migrationerna. Applicera med SAMMA SQL som lokalt, bekräfta kolumnerna
-   och att moln-`purchases` fortfarande har 0 rader:
-   - **0008** `alter table purchases add column if not exists selected_employers bigint[];`
-   - **0009** `revoke all privileges on table purchases from anon, authenticated;`
-     `grant select, insert, update on table purchases to service_role;`
-     (utan 0009 får webhooken "permission denied" – service_role saknade skrivrätt;
-     0009 härdar dessutom purchases mot anon/authenticated eftersom det bär kund-PII.)
-   Sätt även molnets env: `STRIPE_SECRET_KEY` (prod sk_live), `STRIPE_WEBHOOK_SECRET`
+0b. **Rapportbryggans migrationer i MOLNET – KLART 2026-07-23.**
+   0008 (`selected_employers bigint[]`) + 0009 (grants) applicerade via `supabase db
+   push`, historik registrerad, verifierat (kolumn `_int8`, anon/authenticated-grants
+   återkallade). En strandad test-rad (id 2) i moln-`purchases` ska raderas → prod
+   börjar på 0. **Kvar (blockerande före promote):** molnets env-värden nedan +
+   prod-Stripe-nycklar + skarp webhook-registrering.
+   Sätt molnets env: `STRIPE_SECRET_KEY` (prod sk_live), `STRIPE_WEBHOOK_SECRET`
    (prod, efter endpoint-registrering i Stripe), `STRIPE_PRICE_ID=price_1QGSQ3…`,
    `POSTMARK_SERVER_TOKEN`, `POSTMARK_FROM`, `NEXT_PUBLIC_SITE_URL=https://offentligaloner.se`.
 
