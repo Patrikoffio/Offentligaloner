@@ -145,8 +145,19 @@ verifierad end-to-end mot lokala Supabase-stacken (identisk data som molnet):
   **Molnets purchases:** en strandad TEST-rad (id 2, `cs_test_…`, 17:04) från ett
   testköp när dev pekade på molnet – ska raderas så prod-purchases börjar på 0
   (avvaktar bekräftelse). Övriga testrader finns bara lokalt.
-- **Kvar (go-live):** 0008+0009 i molnet + moln-env, prod-Stripe-nycklar, skarp
-  webhook-registrering, promote. Se GO-LIVE-SEKVENS steg 0b + 1.
+- **PROMOTE IKVÄLL (2026-07-23):** moln-env satt i Production scope (sk_live,
+  prod-whsec, Postmark, prod-price `price_1QGSQ3…`, `NEXT_PUBLIC_SITE_URL=
+  https://offentligaloner.vercel.app`, Supabase ×3). Prod-webhook registrerad mot
+  `https://offentligaloner.vercel.app/api/stripe-webhook` (API 2024-06-20, tre
+  checkout-event). `vercel deploy --prod` körd. Slutverifiering: ett skarpt 39 kr-köp
+  (eget kort) → webhook 200, purchases-rad, mejl, token-rapport. **DNS rörs EJ ikväll**
+  (.se pekar på Hetzner tills imorgon).
+- **MORGONDAGENS LISTA (efter DNS-flytt .se → Vercel):**
+  1. Ändra `NEXT_PUBLIC_SITE_URL` → `https://offentligaloner.se` (Production) + **redeploy**
+     (annars bygger token-länkar/mejl fortsatt på vercel.app-aliaset).
+  2. Vercel-deploytoken från ikväll (`vcp_…`, giltig 1 dag) **revokeras** (eller löper ut själv).
+  3. Resten av GO-LIVE-SEKVENS: DNS (Loopia), SSL, ändringsanmälan Mediemyndigheten,
+     Hetzner-karens. vercel.app-webhook-endpointen består efter DNS (behöver ej göras om).
 
 ### ÖGONBLICKSBILD (2026-07-22)
 

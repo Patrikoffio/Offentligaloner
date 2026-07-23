@@ -12,7 +12,7 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
 import type Stripe from "stripe";
-import { stripe, RAPPORT_PRIS_SEK } from "@/lib/stripe";
+import { getStripe, RAPPORT_PRIS_SEK } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase";
 import { sendReportEmail } from "@/lib/email";
 
@@ -200,7 +200,7 @@ export async function POST(req: Request): Promise<Response> {
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(rawBody, sig ?? "", secret);
+    event = getStripe().webhooks.constructEvent(rawBody, sig ?? "", secret);
   } catch (e) {
     console.error("[stripe-webhook] signaturverifiering misslyckades:", (e as Error).message);
     return NextResponse.json({ error: "invalid signature" }, { status: 400 });

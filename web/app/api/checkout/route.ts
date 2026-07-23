@@ -6,7 +6,7 @@
 // rapporten byggs enbart ur matviews.
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { stripe, STRIPE_PRICE_ID } from "@/lib/stripe";
+import { getStripe, stripePriceId } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase";
 import { siteUrl } from "@/lib/site";
 
@@ -17,7 +17,8 @@ const MAX_TITLES = 5;
 const MAX_EMPLOYERS = 5;
 
 export async function POST(req: Request): Promise<Response> {
-  if (!STRIPE_PRICE_ID) {
+  const priceId = stripePriceId();
+  if (!priceId) {
     return NextResponse.json({ error: "STRIPE_PRICE_ID saknas i miljön." }, { status: 500 });
   }
 
@@ -143,7 +144,7 @@ export async function POST(req: Request): Promise<Response> {
 
   const params: Stripe.Checkout.SessionCreateParams = {
     mode: "payment",
-    line_items: [{ price: STRIPE_PRICE_ID, quantity: 1 }],
+    line_items: [{ price: priceId, quantity: 1 }],
     payment_method_types: ["card", "klarna"],
     automatic_tax: { enabled: true },
     locale: "sv",
@@ -168,7 +169,7 @@ export async function POST(req: Request): Promise<Response> {
   };
 
   try {
-    const session = await stripe.checkout.sessions.create(params);
+    const session = await getStripe().checkout.sessions.create(params);
     return NextResponse.json({ url: session.url });
   } catch (e) {
     const msg = (e as Error).message;
