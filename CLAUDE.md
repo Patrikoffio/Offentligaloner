@@ -175,8 +175,71 @@ godkänd spec):
   källhänvisning + metodnot i rapporten. Aldrig individdata.
 - **Stripe secret + service-role endast server-side**, aldrig i klientbundeln.
 - **Pris 39 kr oförändrat. Inget abonnemang** i denna iteration.
-Steg 1 (låsa Stripe-detaljer ur Django-källan via ssh) → steg 2 (bygg-spec för
-godkännande). Först därefter:
+#### RAPPORTBRYGGA – LÅSTA DETALJER + BYGG-SPEC (handover 2026-07-23)
+
+Källa: read-only-extrakt ur `offlon_prod_web` (Django 5.0.6, stripe 9.10.0).
+
+**Gamla flödet (låst):**
+- Val på yrkessida → `sessionStorage._x_selected_titles` (Alpine), max 5 titlar.
+  "Jag är nyfiken!" = htmx `hx-post /create-checkout-session/`, `product=nyfiken`.
+- `CreateStripeCheckoutSessionView`: skapar Order(status=pending) + Stripe Checkout
+  Session, `HX-Redirect` till Stripe. Validerar 1–5 titlar.
+- **Stripe price (PROD, product=nyfiken): `price_1QGSQ3LNrfBYc0eaEvsidyX0`** (=39 kr,
+  beloppet ligger i Stripe). Test/DEBUG: nyfiken `price_1PaZ8OLNrfBYc0eaTIUJ3hDs`,
+  ekonomisk (119 kr abo, EJ live i prod) `price_1PPFj6LNrfBYc0ea5V2fBMPV`.
+- Session-config: `mode='payment'`, **`payment_method_types=['card','klarna']`**,
+  `automatic_tax.enabled=True`, `locale='sv'`, `consent_collection.terms_of_service`,
+  `custom_text` (ångerrätts-waiver, digital tjänst levereras omedelbart),
+  `allow_promotion_codes=True`, `metadata={selected_titles, order_id}`.
+  `success_url=/lyckat?order_id=<order.order_id>`, `cancel_url=/avbryt`.
+- **Fulfillment via WEBHOOK** `/webhooks/stripe/` (checkout.session.completed):
+  skapar user (konto+aktiveringsmejl), `WebReport(titles_array, expiry=now+3mån)`,
+  `send_confirmation_email`, Celery `warm_cache`. → v2 SKA INTE använda webhook (v1).
+- **Rapport `/rapport/<id>/`**: LOGIN-gated (owner==user), byggs ur RÅA
+  `Salary`-rader (`report_context(salaries)`, `report_template_web.html`) → **läcker
+  n<5** (exempelrapport visar n=1,2,3,4). v2 SKA i stället bygga ur matviews n≥5.
+- **Mejl: Postmark** (`EMAIL_BACKEND=anymail.backends.postmark`, `from
+  no-reply@offentligaloner.se`), EJ SendGrid (sendgrid-paket finns men oanvänt).
+  → v2 återanvänder Postmark-kontot/servertoken, ingen ny tjänst.
+
+**`purchases`-schemat idag:** id, email, product, generalized_title_id, employer_id,
+amount_sek, stripe_session, created_at. Saknar: report_token, selected_slugs (multi),
+expires_at, status → **migration 0007** krävs.
+
+**BYGG-SPEC v2 (variant C, härdad) – bygg i fräsch session efter godkännande:**
+1. **Migration 0007**: utöka `purchases` (el. ny `report_orders`): `report_token text
+   unique`, `selected_slugs text[]`, `status text`, `expires_at timestamptz`,
+   `stripe_session text` (finns), `amount_sek`, `email` (finns). Ingen individdata.
+2. **Beställningskomponent** (yrkessida): kryssa upp till 5 titlar (klientstate),
+   "Beställ lönerapport (39 kr)" → `POST /api/checkout` (Next route handler).
+3. **`/api/checkout` (server-side)**: validera 1–5 slugs som har n≥5
+   (title_national_stats); skapa Stripe Checkout Session (återanvänd
+   `price_1QGSQ3LNrfBYc0eaEvsidyX0`, `['card','klarna']`, automatic_tax, locale sv,
+   consent/ångerrätt, metadata=selected_slugs); `success_url=/rapport/skapad?session_id=
+   {CHECKOUT_SESSION_ID}`, `cancel_url=/rapport/avbruten`. Returnera session.url.
+   **Stripe secret endast server-side.**
+4. **`/rapport/skapad` (server-side, HÄRDAD)**: `stripe.checkout.sessions.retrieve` →
+   kräv `payment_status==='paid'` FÖRE leverans. Om paid + ingen rad för session:
+   skapa purchases-rad (report_token=slumpad 32 byte, selected_slugs ur metadata,
+   expires_at=now+3mån, email ur customer_details, status=paid). Idempotent på
+   stripe_session. Visa/länka rapport + skicka Postmark-mejl med token-URL.
+   **Aldrig leverans på blott retur-URL.**
+5. **`/rapport/[token]` (server-side)**: slå upp purchases på token (404 annars);
+   expires_at<now → utgången; rendera ur matviews (title_national_stats +
+   title_employer_stats) för slugs, n≥5, max 5, sektioner Allmänt/Antal/Lönespridning
+   + källhänvisning + metodnot. Ingen inloggning (token=access), ingen individdata.
+6. **Mejl**: Postmark server-side (samma konto), from no-reply@offentligaloner.se.
+   Kräver Postmark-token + avsändardomän i Vercel-env → föreslå/invänta ok.
+
+**Behövs från Patrik före bygge:** Stripe PROD secret key (Vercel-env), bekräfta att
+`price_1QGSQ3...` = 39 kr aktiv, Postmark server-token + domänverifiering. Beslut:
+tokenserad rapport (INGA kundkonton/aktiveringsmejl som gamla flödet).
+
+**RADERA-LISTA Hetzner** (fråga före radering): `/tmp/fresh_salaries_*.dump`,
+`/tmp/dump_on_server.sh`, `/tmp/diagnose_server.sh`, `/tmp/extract_django_source.sh`,
+`/tmp/offlon_source_*.txt`, `/tmp/offlon_diag_*.txt`.
+
+Först därefter (efter godkänd+byggd rapportbrygga):
 
 1. **Omgranskning** av preview: data, yrkessidor, redirects (301), footer med
    utgivningsbevis, källhänvisningar.
