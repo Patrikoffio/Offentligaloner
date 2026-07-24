@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { supabaseAdmin } from "@/lib/supabase";
+import Image from "next/image";
 import { METHOD_NOTE } from "@/lib/copy";
 
 export const metadata: Metadata = {
@@ -27,12 +27,7 @@ function Section({
   );
 }
 
-export default async function OmTjansten() {
-  const { count } = await supabaseAdmin
-    .from("employers")
-    .select("*", { count: "exact", head: true });
-  const employerCount = (count ?? 156).toLocaleString("sv-SE");
-
+export default function OmTjansten() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent-strong">
@@ -42,38 +37,59 @@ export default async function OmTjansten() {
         Offentliga löner
       </h1>
 
-      {/*
-        ⚠️ PLATSHÅLLARTEXT – Patrik skriver om detta stycke före deploy.
-        Nedan är beställningens textutkast, inlagt som utgångspunkt.
-      */}
       <Section title="Varför Offentliga löner finns">
         <p>
-          Offentliga löner startade med en enkel övertygelse: lönerna i offentlig
-          sektor är redan offentliga – men i praktiken oåtkomliga för den som bäst
-          behöver dem. Uppgifterna finns, utspridda hos kommuner och regioner, men
-          den enskilda undersköterskan, läraren eller handläggaren har sällan tid
-          eller verktyg att begära ut och tolka dem inför sin löneförhandling.
+          Lönerna i offentlig sektor är offentliga handlingar. I praktiken är de
+          ändå svåra att komma åt: uppgifterna finns utspridda hos varje enskild
+          kommun, region och myndighet, i olika format, och kräver att någon begär
+          ut dem och sammanställer dem.
         </p>
         <p>
-          Det ville jag ändra på. Sedan 2024 begär vi ut faktiska utbetalda löner
-          enligt offentlighetsprincipen, kvalitetssäkrar dem och gör dem sökbara –
-          för att arbetstagaren ska möta arbetsgivaren med samma kunskapsläge. Inga
-          enkäter, inga uppskattningar. Och aldrig någonsin enskilda personers löner
-          – bara mönstren, som hjälper dig se var du står.
+          Det gör att parterna i ett lönesamtal sällan har samma bild.
+          Arbetsgivaren har lönestatistik, budgetramar och kännedom om hela sin
+          personalstyrka. Den anställde har oftast rykten, ett par kollegor att
+          jämföra med och en känsla av att ligga rätt eller fel. Det är ingen bra
+          grund för ett samtal som ska handla om prestation och ansvar.
+        </p>
+        <p>
+          Offentligalöner finns för att jämna ut den skillnaden. Vi har begärt ut
+          lönelistor från 156 kommuner och regioner och sammanställt dem till en
+          enhetlig databas: 534 293 löneuppgifter från 2024 års insamling,
+          omräknade till heltidsekvivalent lön så att deltid inte snedvrider
+          jämförelsen. För 2 151 yrkestitlar finns tillräckligt underlag för att
+          redovisa statistik som går att luta sig mot. För yrken där underlaget är
+          för litet för att redovisa löner utan att enskilda personer kan
+          identifieras visar vi i stället vad vi vet om yrket och var det
+          förekommer.
+        </p>
+        <p>
+          <strong>För dig som är anställd</strong> betyder det att du kan gå in i
+          lönesamtalet med siffror i stället för antaganden – och veta både var du
+          står och vad som är rimligt att fråga efter.
+        </p>
+        <p>
+          <strong>För dig som är arbetsgivare</strong> betyder det samma sak från
+          andra hållet: ett oberoende jämförelseunderlag vid rekrytering,
+          lönekartläggning och den egna lönebildningen, särskilt om den egna
+          organisationen är för liten för att ge meningsfull statistik.
+        </p>
+        <p>
+          Vi tar inte ställning i enskilda löneförhandlingar och gör inga
+          rekommendationer om vad någon bör tjäna. Vi redovisar vad som faktiskt
+          betalas, varifrån uppgifterna kommer och när de samlades in. Vad man gör
+          med den kunskapen är upp till den som läser.
         </p>
       </Section>
 
       <Section title="Vem står bakom">
         <div className="flex items-start gap-5">
-          {/* Plats för foto (valfritt) – lägg en bild i /public och byt ut rutan. */}
-          <div
-            aria-hidden
-            className="hidden sm:flex shrink-0 h-24 w-24 rounded-full bg-plate-blue border border-gray-200 items-center justify-center text-xs text-gray-400 text-center leading-tight"
-          >
-            Foto
-            <br />
-            (valfritt)
-          </div>
+          <Image
+            src="/patrik.jpg"
+            alt="Patrik Larsson, ansvarig utgivare"
+            width={96}
+            height={96}
+            className="hidden sm:block shrink-0 h-24 w-24 rounded-full object-cover border border-gray-200"
+          />
           <div className="space-y-3">
             <p>
               Tjänsten drivs av <strong>Patrik Larsson</strong>, som är både
@@ -91,16 +107,13 @@ export default async function OmTjansten() {
 
       <Section title="Så samlas datan in">
         <p>
-          Underlaget hämtas in via offentlighetsprincipen: vi begär ut
-          lönelistorna från kommuner och regioner, som är skyldiga att lämna ut
-          dem. 2024 års insamling omfattar <strong>{employerCount}</strong>{" "}
-          kommuner och regioner.
-        </p>
-        <p>
-          Alla löner räknas om till heltidsekvivalent månadslön så att de går att
-          jämföra rättvist, oavsett sysselsättningsgrad. Uppgifterna städas och
-          kvalitetssäkras innan de publiceras – felaktiga och orimliga värden
-          flaggas och utesluts. Nästa rikstäckande insamling inleds i augusti 2026.
+          Löner i offentlig sektor är offentliga handlingar. Vi begär ut dem direkt
+          från arbetsgivarna – 156 kommuner och regioner lämnade ut sina
+          lönelistor för 2024 års insamling. Uppgifterna kommer in i vitt skilda
+          format och sammanställs hos oss till en enhetlig databas, där lönerna
+          räknas om till heltidsekvivalent nivå och yrkestitlar grupperas så att
+          samma yrke blir jämförbart mellan arbetsgivare. Varje publicerad siffra
+          är kopplad till sitt utlämningsdatum och sin källa.
         </p>
       </Section>
 
