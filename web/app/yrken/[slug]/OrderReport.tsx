@@ -160,7 +160,7 @@ export default function OrderReport({
       <button
         onClick={order}
         disabled={loading || titles.length === 0 || emps.length === 0}
-        className="bg-blue-600 text-white text-sm px-5 py-2.5 rounded hover:bg-blue-700 disabled:opacity-50"
+        className="bg-brand text-white text-sm px-5 py-2.5 rounded-lg hover:opacity-90 disabled:opacity-50"
       >
         {loading ? "Öppnar betalning…" : "Beställ lönerapport (39 kr)"}
       </button>
@@ -186,14 +186,14 @@ function Chips({
       {items.map((it) => (
         <span
           key={it.key}
-          className="inline-flex items-center gap-1 bg-blue-600 text-white text-xs rounded-full pl-3 pr-1 py-1"
+          className="inline-flex items-center gap-1 bg-brand text-white text-xs rounded-full pl-3 pr-1 py-1"
         >
           {it.label}
           <button
             type="button"
             onClick={() => onRemove(it.key)}
             aria-label={`Ta bort ${it.label}`}
-            className="ml-1 h-4 w-4 rounded-full hover:bg-blue-700 flex items-center justify-center"
+            className="ml-1 h-4 w-4 rounded-full hover:bg-brand-mid flex items-center justify-center"
           >
             ×
           </button>
@@ -247,7 +247,7 @@ function TitleSearch({
         disabled={disabled}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Sök fler yrken…"
-        className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+        className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 disabled:bg-gray-100"
       />
       {visible.length > 0 && (
         <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded shadow-sm max-h-56 overflow-auto">
@@ -260,7 +260,7 @@ function TitleSearch({
                   setQ("");
                   setResults([]);
                 }}
-                className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50"
+                className="w-full text-left px-3 py-2 text-sm hover:bg-plate-blue"
               >
                 {r.title}
               </button>
@@ -301,7 +301,7 @@ function EmployerSearch({
         disabled={disabled}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Sök kommun eller region…"
-        className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+        className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 disabled:bg-gray-100"
       />
       {visible.length > 0 && (
         <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded shadow-sm max-h-56 overflow-auto">
@@ -313,7 +313,7 @@ function EmployerSearch({
                   onPick(e);
                   setQ("");
                 }}
-                className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50"
+                className="w-full text-left px-3 py-2 text-sm hover:bg-plate-blue"
               >
                 {e.name}
               </button>
@@ -330,7 +330,7 @@ export function ContactLine() {
   return (
     <p className="text-xs text-gray-500 mb-10">
       Behöver du fler yrken, hela landet eller fullständiga datauttag?{" "}
-      <a href={`mailto:${CONTACT_EMAIL}`} className="text-blue-600 hover:underline">
+      <a href={`mailto:${CONTACT_EMAIL}`} className="text-brand-mid hover:underline">
         Kontakta oss
       </a>
       .

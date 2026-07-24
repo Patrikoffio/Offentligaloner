@@ -54,7 +54,7 @@ export default function SkickaIgenForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="din@epost.se"
-          className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30"
         />
       </div>
       {state === "error" && (
@@ -63,7 +63,7 @@ export default function SkickaIgenForm() {
       <button
         type="submit"
         disabled={state === "sending"}
-        className="bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+        className="bg-brand text-white text-sm px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50"
       >
         {state === "sending" ? "Skickar…" : "Skicka mina rapportlänkar"}
       </button>

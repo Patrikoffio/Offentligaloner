@@ -106,12 +106,22 @@ export async function generateMetadata({
 
   if (!data) return { title: "Yrke" };
 
+  const description =
+    descriptionPlain(data.ai_description) ||
+    `Lönestatistik för ${data.title} i kommuner och regioner i Sverige.`;
+  // Kanonisk URL per yrke (utan www; metadataBase gör den absolut).
+  const canonicalPath = `/yrken/${slug}`;
+
   return {
     title: `Lön – ${data.title}`,
-    description:
-      descriptionPlain(data.ai_description) ||
-      `Lönestatistik för ${data.title} i kommuner och regioner i Sverige.`,
+    description,
     keywords: data.seo_keywords ?? undefined,
+    alternates: { canonical: canonicalPath },
+    openGraph: {
+      url: canonicalPath,
+      title: `Lön – ${data.title}`,
+      description,
+    },
   };
 }
 
@@ -353,7 +363,7 @@ export default async function YrkeSida({
       {/* Rubrik */}
       <h1 className="text-3xl font-bold tracking-tight mb-1">{title.title}</h1>
       {title.category && (
-        <p className="text-sm text-blue-600 mb-4">{title.category}</p>
+        <p className="text-sm text-brand-mid mb-4">{title.category}</p>
       )}
       {descriptionParagraphs(title.ai_description).length > 0 && (
         <div className="text-gray-600 mb-8 max-w-2xl space-y-3">
@@ -438,7 +448,7 @@ export default async function YrkeSida({
               </p>
               <Link
                 href="/"
-                className="inline-block bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700"
+                className="inline-block bg-brand text-white text-sm px-4 py-2 rounded-lg hover:opacity-90"
               >
                 Tillbaka till startsidan
               </Link>
@@ -488,7 +498,7 @@ export default async function YrkeSida({
                 <div className="flex-1 bg-gray-100 rounded-full h-5 relative">
                   <div
                     className={`h-5 rounded-full ${
-                      highlight ? "bg-blue-500" : "bg-blue-300"
+                      highlight ? "bg-brand" : "bg-brand-light"
                     }`}
                     style={{ width: `${Math.round((value / maxVal) * 100)}%` }}
                   />

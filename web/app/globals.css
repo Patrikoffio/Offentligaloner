@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
+/*
+  Designsystem – Offentliga löner
+  ───────────────────────────────
+  Färger härledda ur logotypen. Dokumentkänsla, ljust tema (ingen dark mode:
+  sajten är innehålls-/utskriftsorienterad och lönerapporten trycks i färg).
+
+    brand         #0C447C  mörkblå – ordmärke, rubrikaccenter, primär knapp
+    brand-mid     #378ADD  mellanblå – logo-stapel, länkar
+    brand-light   #85B7EB  ljusblå – logo-stapel, band
+    accent        #F0997B  mjuk orange – logo-cirkel, dekor
+    accent-strong #D85A30  stark orange – nyckeltal, kommun-punkt
+    accent-dark   #993C1D  djup orange – kommunens siffror i tabell
+    plate-blue    #F4F8FC  ljusblå platta – nyckeltalskort (median)
+    plate-orange  #FAECE7  ljus orange platta – nyckeltalskort (kommun)
+
+  Typografi: Geist (sans, UI/brödtext) + Source Serif 4 (serif, rubriker i
+  hero/rapport, positionsnot i kursiv).
+*/
+
+@theme {
+  --color-brand: #0c447c;
+  --color-brand-mid: #378add;
+  --color-brand-light: #85b7eb;
+  --color-accent: #f0997b;
+  --color-accent-strong: #d85a30;
+  --color-accent-dark: #993c1d;
+  --color-plate-blue: #f4f8fc;
+  --color-plate-orange: #faece7;
+
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-source-serif), Georgia, "Times New Roman", serif;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+/* Tabulära siffror (nyckeltal, tabeller, lönevärden) */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Utskrift av lönerapporten ─────────────────────────────────────────────
+   @page-marginaler + färgåtergivning; sidbrytning och dölj/visa hanteras via
+   Tailwinds print:-varianter i markup (print:hidden, break-before-page,
+   hidden print:block). Här bara det som inte går att uttrycka som utility. */
+@media print {
+  @page {
+    margin: 16mm 14mm 22mm;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  /* Plattor, band och accentfärger ska med i trycket */
+  .report-root {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }

@@ -43,7 +43,7 @@ export default async function SkapadSida({
           <p className="font-medium text-green-900 mb-3">Din rapport är klar!</p>
           <a
             href={`/rapport/${token}`}
-            className="inline-block bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700"
+            className="inline-block bg-brand text-white text-sm px-4 py-2 rounded-lg hover:opacity-90"
           >
             Öppna lönerapporten
           </a>

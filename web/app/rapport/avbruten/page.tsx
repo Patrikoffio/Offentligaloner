@@ -15,7 +15,7 @@ export default function AvbrutenSida() {
       </p>
       <a
         href="/"
-        className="inline-block bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700"
+        className="inline-block bg-brand text-white text-sm px-4 py-2 rounded-lg hover:opacity-90"
       >
         Till startsidan
       </a>

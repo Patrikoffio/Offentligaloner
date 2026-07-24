@@ -49,7 +49,7 @@ export default function Poller({ sessionId }: { sessionId: string }) {
         <p className="font-medium text-green-900 mb-3">Din rapport är klar!</p>
         <a
           href={`/rapport/${token}`}
-          className="inline-block bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700"
+          className="inline-block bg-brand text-white text-sm px-4 py-2 rounded-lg hover:opacity-90"
         >
           Öppna lönerapporten
         </a>
@@ -61,7 +61,7 @@ export default function Poller({ sessionId }: { sessionId: string }) {
   }
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
+    <div className="bg-plate-blue border border-brand-light rounded-lg p-5">
       <p className="font-medium text-blue-900 mb-2">
         {done ? "Rapporten mejlas när betalningen bekräftats" : "Bekräftar din betalning…"}
       </p>
@@ -71,7 +71,7 @@ export default function Poller({ sessionId }: { sessionId: string }) {
             "den är klar mejlar vi rapportlänken till dig. Du kan stänga den här sidan."
           : "Ett ögonblick – vi väntar in bekräftelsen från betalleverantören."}
       </p>
-      <p className="text-xs text-blue-700 mt-3">
+      <p className="text-xs text-brand mt-3">
         Fick du inget mejl?{" "}
         <a href="/rapport/skicka-igen" className="underline">
           Skicka länken igen
