@@ -77,6 +77,52 @@ Källa: `20241027_backup_salaries.dump` (Postgres 16, custom format).
 - Commits på svenska, imperativ.
 - Inga hemligheter i repo. `/data` (rådata med persondata) är gitignorad.
 
+## Designsystem (v2-webb, from 2026-07-24)
+
+Följ detta i all ny webb-UI. Ljust tema, dokumentkänsla (ingen dark mode – sajten
+är innehålls-/utskriftsorienterad och lönerapporten trycks i färg). Definierat i
+`web/app/globals.css` (`@theme`-tokens) – använd tokens, inte lösa hex.
+
+**Färger (Tailwind-token → hex → användning):**
+- `brand` `#0C447C` – mörkblå: ordmärke, primär knapp, rubrikaccent, band 25–75.
+- `brand-mid` `#378ADD` – länkar, kategoritext, logo-stapel.
+- `brand-light` `#85B7EB` – ljusblå: logo-stapel, staplar på yrkessidan.
+- `accent` `#F0997B` – mjuk orange: logo-cirkel, dekor.
+- `accent-strong` `#D85A30` – stark orange: nyckeltal (kommun), kommun-punkt i band.
+- `accent-dark` `#993C1D` – djup orange: kommunens siffror i rapporttabellen.
+- `plate-blue` `#F4F8FC` – ljusblå platta: nyckeltalskort (median/mål), stat-kort.
+- `plate-orange` `#FAECE7` – ljus orange platta: nyckeltalskort (kommun).
+- Band (rapport): ljusblått spann `#CFE3F6` (10–90), mörkblått `#0C447C` (25–75),
+  medianlinje `#08243F`.
+
+**Logotyp** (`web/components/Logo.tsx`, geometri låst i viewBox 64 – samma i
+`app/icon.svg` favicon + `app/apple-icon.tsx` 180 px): rundad kvadrat `#0C447C`
+radius 15 (~23 %); tre stigande pill-staplar (rx = halva bredden 4.5) x=13/27.5/42,
+bredd 9, höjder 15/23/31 från baslinje y=49, färger `#378ADD`/`#85B7EB`/`#FFFFFF`;
+orange cirkel `#F0997B` cx=46.5 cy=11 r=4. Ordmärke: "Offentliga löner" i `brand`,
+weight 500, `font-sans`.
+
+**Typografi:** `font-sans` = Geist (UI/brödtext), `font-serif` = Source Serif 4
+(hero-rubrik, rapportens yrkestitel 24 px, positionsnot i kursiv). Båda via
+`next/font` som CSS-variabler i `layout.tsx`. Lönevärden/nyckeltal/tabeller:
+klass `.tnum` (tabulära siffror).
+
+**Återkommande komponenter:** `SiteHeader` (alla sidor, `print:hidden`),
+`DistributionBand` (spridningsband), `PaymentMarks` (endast "Säker betalning via
+Stripe" – inga betalmärken; officiella brand-assets fanns ej, egna får ej ritas).
+Delad copy som måste vara identisk (rapportens metodnot = om-sidans
+integritetsprincip) i `web/lib/copy.ts`. Print-CSS för rapporten: `@page`-marginaler
+i globals, sidbrytning per yrke (`break-before-page`), dold navigering, fast sidfot
+per utskriven sida.
+
+## Kända avvägningar
+
+- **Sök vs. index:** autocomplete returnerar de **2 151** yrkestitlar som har
+  publicerbar statistik (n≥5, `title_national_stats` inner-join), medan sitemapen
+  listar **5 821** slugs inkl. **3 670** informationssidor (titlar utan n≥5-data –
+  avsiktligt indexerbara för long-tail-SEO men ej sökbara). Slug = titel, inte
+  titel×kommun. Avsiktligt; **se över efter SEO-stabiliseringen.**
+
 ## Utgivningsbevis (nr 2024-077, giltigt t.o.m. 2034-10-28) – systemkrav
 
 Databasen "Offentliga löner, offentligaloner.se" har utgivningsbevis från
