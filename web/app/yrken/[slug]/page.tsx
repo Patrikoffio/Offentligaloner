@@ -12,6 +12,7 @@ import OrderReport, {
   type TitleOption,
   type EmployerOption,
 } from "./OrderReport";
+import { availablePaymentLogos } from "@/lib/paymentLogos";
 
 // ─── Typer ──────────────────────────────────────────────────────────────────
 
@@ -538,6 +539,7 @@ export default async function YrkeSida({
             defaultTitle={title.title}
             titleCandidates={orderCandidates}
             employers={allEmployers}
+            paymentLogos={availablePaymentLogos()}
           />
           <ContactLine />
         </>

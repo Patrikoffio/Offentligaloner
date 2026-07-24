@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { PaymentTrust, type PaymentLogo } from "@/components/PaymentTrust";
 
 export interface TitleOption {
   slug: string;
@@ -24,11 +25,13 @@ export default function OrderReport({
   defaultTitle,
   titleCandidates,
   employers,
+  paymentLogos = [],
 }: {
   defaultSlug: string;
   defaultTitle: string;
   titleCandidates: TitleOption[];
   employers: EmployerOption[];
+  paymentLogos?: PaymentLogo[];
 }) {
   const [titles, setTitles] = useState<TitleOption[]>([
     { slug: defaultSlug, title: defaultTitle },
@@ -164,9 +167,12 @@ export default function OrderReport({
       >
         {loading ? "Öppnar betalning…" : "Beställ lönerapport (39 kr)"}
       </button>
-      <p className="text-xs text-gray-400 mt-3">
-        Betalning via kort eller Klarna. Rapporten bygger på aggregerad statistik
-        (minst 5 individer) – ingen individdata.
+
+      <PaymentTrust logos={paymentLogos} />
+
+      <p className="text-xs text-gray-400 mt-3 text-center">
+        Rapporten bygger på aggregerad statistik (minst 5 individer) – ingen
+        individdata.
       </p>
     </section>
   );

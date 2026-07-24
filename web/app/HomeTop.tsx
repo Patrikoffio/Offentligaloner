@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import PaymentMarks from "@/components/PaymentMarks";
+import { PaymentTrust, type PaymentLogo } from "@/components/PaymentTrust";
 
 interface TitleHit {
   slug: string;
@@ -30,10 +30,12 @@ export default function HomeTop({
   count_salaries,
   count_employers,
   count_titles,
+  paymentLogos = [],
 }: {
   count_salaries: number;
   count_employers: number;
   count_titles: number;
+  paymentLogos?: PaymentLogo[];
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -74,11 +76,9 @@ export default function HomeTop({
   }
 
   const stats = [
-    {
-      value: nf(count_salaries),
-      label: `Löner från ${nf(count_employers)} kommuner och regioner`,
-    },
-    { value: titlesFmt, label: "yrkestitlar med lönestatistik" },
+    { value: nf(count_salaries), label: "Löneuppgifter" },
+    { value: nf(count_employers), label: "Kommuner och regioner" },
+    { value: titlesFmt, label: "Yrkestitlar med lönestatistik" },
   ];
 
   return (
@@ -126,7 +126,7 @@ export default function HomeTop({
       </div>
 
       {/* Nyckeltal ur datan */}
-      <div className="grid grid-cols-2 gap-3 mt-6">
+      <div className="grid grid-cols-3 gap-3 mt-6">
         {stats.map((s) => (
           <div
             key={s.label}
@@ -166,9 +166,7 @@ export default function HomeTop({
       </div>
 
       {/* Betalförtroende */}
-      <div className="mt-7">
-        <PaymentMarks center />
-      </div>
+      <PaymentTrust logos={paymentLogos} />
     </div>
   );
 }

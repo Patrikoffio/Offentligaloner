@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { supabaseAdmin } from "@/lib/supabase";
 import Link from "next/link";
 import HomeTop from "./HomeTop";
+import { availablePaymentLogos } from "@/lib/paymentLogos";
 
 // Kanonisk URL för startsidan (metadataBase gör den absolut: https://
 // offentligaloner.se/). Titel/beskrivning ärvs från layout.
@@ -42,6 +43,7 @@ export default async function Home() {
         count_salaries={salaries.count ?? 534293}
         count_employers={employers.count ?? 156}
         count_titles={titles.count ?? 2151}
+        paymentLogos={availablePaymentLogos()}
       />
 
       {/* Vanligaste yrkena */}

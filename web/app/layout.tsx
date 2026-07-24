@@ -4,7 +4,6 @@ import { Analytics } from "@vercel/analytics/next";
 import Link from "next/link";
 import { siteUrl } from "@/lib/site";
 import SiteHeader from "@/components/SiteHeader";
-import PaymentMarks from "@/components/PaymentMarks";
 import "./globals.css";
 
 // Sans (UI/brödtext) + serif (rubriker i hero/rapport, positionsnot i kursiv).
@@ -59,7 +58,6 @@ export default function RootLayout({
         */}
         <footer className="print:hidden border-t border-gray-200 mt-16 py-8 px-4 text-xs text-gray-500">
           <div className="max-w-4xl mx-auto space-y-4">
-            <PaymentMarks />
             <div className="space-y-1">
               <p>
                 <strong className="text-gray-700">
