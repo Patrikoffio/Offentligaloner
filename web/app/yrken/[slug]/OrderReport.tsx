@@ -109,7 +109,7 @@ export default function OrderReport({
       <p className="text-sm text-gray-600 mb-5">
         Välj upp till {MAX_TITLES} yrken och upp till {MAX_EMPLOYERS} kommuner/regioner.
         Du får en samlad, PDF-vänlig rapport (giltig i tre månader) med nationell
-        lönespridning och statistik för dina valda arbetsgivare.
+        lönespridning och statistik för de kommuner och regioner du väljer.
         <span className="font-medium"> 99 kr.</span>
       </p>
 
@@ -413,18 +413,21 @@ function EmployerSearch({
   );
 }
 
-// Diskret B2B-rad (exporteras för att kunna placeras längst ner på yrkessidan).
-// Hela raden är en mailto-länk med förifylld ämnesrad – ingen knapp, ingen ram.
+// Diskret B2B-rad (exporteras för att placeras längst ner på yrkessidan). Egen
+// avgränsad yta med svag bakgrund, skild från källhänvisningen. "Kontakta oss" är
+// en mailto-länk med förifylld ämnesrad. Ingen knapp, ingen ram.
 export function ContactLine() {
   return (
-    <p className="text-xs text-gray-400 mt-10">
+    <div className="mt-8 rounded-lg bg-gray-50 px-4 py-3 text-xs leading-relaxed text-gray-500">
+      Arbetsgivare, forskare eller journalist? Vi levererar bredare uttag – fler
+      yrken, hela landet, flera insamlingsår.{" "}
       <a
         href={`mailto:${CONTACT_EMAIL}?subject=Datauttag`}
-        className="hover:text-gray-600 hover:underline"
+        className="text-brand-mid hover:underline"
       >
-        Arbetsgivare, forskare eller journalist? Vi levererar bredare uttag – fler
-        yrken, hela landet, flera insamlingsår.
+        Kontakta oss
       </a>
-    </p>
+      .
+    </div>
   );
 }
