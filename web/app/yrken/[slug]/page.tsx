@@ -548,7 +548,6 @@ export default async function YrkeSida({
             employers={allEmployers}
             paymentLogos={availablePaymentLogos()}
           />
-          <ContactLine />
         </>
       )}
 
@@ -647,6 +646,9 @@ export default async function YrkeSida({
           Individdata visas aldrig — aggregat kräver minst 5 individer.
         </p>
       </section>
+
+      {/* B2B/bredare uttag – diskret rad längst ner, efter arbetsgivartabellen */}
+      {national && <ContactLine />}
     </div>
   );
 }

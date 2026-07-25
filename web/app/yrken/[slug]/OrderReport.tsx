@@ -413,15 +413,18 @@ function EmployerSearch({
   );
 }
 
-// Diskret kontaktrad under modulen (exporteras för att kunna placeras separat).
+// Diskret B2B-rad (exporteras för att kunna placeras längst ner på yrkessidan).
+// Hela raden är en mailto-länk med förifylld ämnesrad – ingen knapp, ingen ram.
 export function ContactLine() {
   return (
-    <p className="text-xs text-gray-500 mb-10">
-      Behöver du fler yrken, hela landet eller fullständiga datauttag?{" "}
-      <a href={`mailto:${CONTACT_EMAIL}`} className="text-brand-mid hover:underline">
-        Kontakta oss
+    <p className="text-xs text-gray-400 mt-10">
+      <a
+        href={`mailto:${CONTACT_EMAIL}?subject=Datauttag`}
+        className="hover:text-gray-600 hover:underline"
+      >
+        Arbetsgivare, forskare eller journalist? Vi levererar bredare uttag – fler
+        yrken, hela landet, flera insamlingsår.
       </a>
-      .
     </p>
   );
 }
