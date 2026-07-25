@@ -26,12 +26,14 @@ export default function OrderReport({
   defaultTitle,
   titleCandidates,
   employers,
+  medianSpread = null,
   paymentLogos = [],
 }: {
   defaultSlug: string;
   defaultTitle: string;
   titleCandidates: TitleOption[];
   employers: EmployerOption[];
+  medianSpread?: number | null;
   paymentLogos?: PaymentLogo[];
 }) {
   const [titles, setTitles] = useState<TitleOption[]>([
@@ -194,10 +196,13 @@ export default function OrderReport({
             Jämför upp till 5 yrken och 5 kommuner eller regioner i samma rapport.
           </li>
         </ul>
-        <p className="text-xs text-gray-500 mt-3">
-          En löneökning på 500 kr/mån är 6 000 kr på ett år – och följer med varje
-          år framåt.
-        </p>
+        {medianSpread != null && medianSpread > 0 && (
+          <p className="text-xs text-gray-500 mt-3">
+            Mellan kommunerna i listan nedan skiljer det{" "}
+            {Math.round(medianSpread).toLocaleString("sv-SE")} kr i månaden för{" "}
+            {defaultTitle}. Rapporten visar var din kommun ligger.
+          </p>
+        )}
         <p className="text-[11px] leading-relaxed text-gray-400 mt-3">
           Bygger på faktiska löner utlämnade enligt offentlighetsprincipen, endast
           där minst 5 anställda har samma roll. 2024 års insamling, omräknat till

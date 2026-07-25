@@ -346,6 +346,20 @@ export default async function YrkeSida({
     sourceList.map((s) => s.received_at ?? s.salary_date),
   );
 
+  // Lönespridning mellan arbetsgivarna i tabellen: skillnaden mellan högsta och
+  // lägsta publicerade medianlön. Endast arbetsgivare med minst 20 anställda i
+  // titeln räknas, så små underlag inte ger ett orimligt tal. Färre än 5
+  // kvalificerade → ingen rad (medianSpread = null). Redovisas som skillnad,
+  // aldrig som möjlighet.
+  const spreadQualified = employerList.filter(
+    (e) => e.n >= 20 && e.median != null,
+  );
+  const medianSpread =
+    spreadQualified.length >= 5
+      ? Math.max(...spreadQualified.map((e) => e.median)) -
+        Math.min(...spreadQualified.map((e) => e.median))
+      : null;
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
       {/* Brödsmula */}
@@ -546,6 +560,7 @@ export default async function YrkeSida({
             defaultTitle={title.title}
             titleCandidates={orderCandidates}
             employers={allEmployers}
+            medianSpread={medianSpread}
             paymentLogos={availablePaymentLogos()}
           />
         </>
