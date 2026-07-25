@@ -477,13 +477,6 @@ export default async function YrkeSida({
       {/* Lönedistribution */}
       {national && (
         <section className="mb-10">
-          <p className="border-l-[3px] border-brand pl-3 mb-4 text-sm text-gray-600 max-w-2xl">
-            Faktiska, utbetalda löner – utlämnade av arbetsgivarna enligt
-            offentlighetsprincipen, inte enkätsvar eller uppskattningar. Underlaget
-            kommer från {sourceList.length} arbetsgivare
-            {sourceCitationRange ? `, ${sourceCitationRange}` : ` ${year}`} och
-            publiceras under utgivningsbevis nr 2024-077.
-          </p>
           <h2 className="text-xl font-semibold mb-1">
             Löner {year} — {national.n.toLocaleString("sv-SE")} anställda
           </h2>
@@ -541,6 +534,28 @@ export default async function YrkeSida({
               </div>
             ))}
           </div>
+
+          {/* Lönespridning som eget budskap direkt under grafen – sidans
+              starkaste argument. Samma X (medianSpread) som i beställningsblockets
+              värderad. Formulerad som skillnad, aldrig som möjlighet. */}
+          {medianSpread != null && medianSpread > 0 && (
+            <p className="font-serif text-xl sm:text-2xl leading-snug text-gray-900 max-w-2xl mt-7">
+              Mellan kommunerna skiljer det{" "}
+              <span className="text-accent-strong">
+                {formatSalary(medianSpread)}
+              </span>{" "}
+              i månaden för {title.title} – samma yrke, olika arbetsgivare.
+            </p>
+          )}
+
+          {/* Proveniens – flyttad till UNDER grafen (mindre text före grafen) */}
+          <p className="border-l-[3px] border-brand pl-3 mt-6 text-sm text-gray-600 max-w-2xl">
+            Faktiska, utbetalda löner – utlämnade av arbetsgivarna enligt
+            offentlighetsprincipen, inte enkätsvar eller uppskattningar. Underlaget
+            kommer från {sourceList.length} arbetsgivare
+            {sourceCitationRange ? `, ${sourceCitationRange}` : ` ${year}`} och
+            publiceras under utgivningsbevis nr 2024-077.
+          </p>
 
           {/* Metodnot för uppräkning (punkt 4) – visas bara när flaggan är på */}
           {PROJECTION_ENABLED &&

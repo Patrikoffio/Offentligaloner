@@ -239,6 +239,11 @@ export default function OrderReport({
         </span>
       </label>
 
+      <p className="text-xs text-gray-500 mb-3">
+        Vi lämnar ändå 30 dagars nöjd-kund-garanti – inte nöjd, hör av dig så får du
+        pengarna tillbaka.
+      </p>
+
       {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
 
       <button
