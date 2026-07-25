@@ -24,11 +24,13 @@ const nextConfig: NextConfig = {
       ...legacy,
 
       // 2. Gamla informationssidor → startsidan (footern bär utgivningsbevis-uppgifter)
+      //    OBS: /integritetspolicy INTE här längre – v2 har en egen sida på den
+      //    URL:en (footer-länk). En redirect här körs före filsystemsrutten och
+      //    skulle dölja sidan.
       { source: "/loner/alla", destination: "/", statusCode: 301 },
       { source: "/utgivningsbevis", destination: "/", statusCode: 301 },
-      { source: "/integritetspolicy", destination: "/", statusCode: 301 },
       { source: "/cookies", destination: "/", statusCode: 301 },
-      { source: "/anvandarvillkor", destination: "/", statusCode: 301 },
+      { source: "/anvandarvillkor", destination: "/kopvillkor", statusCode: 301 },
       { source: "/arbetsgivare-journalister", destination: "/", statusCode: 301 },
 
       // 3. Generell strukturell ändring: /loner/<slug> → /yrken/<slug>
