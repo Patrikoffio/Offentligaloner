@@ -122,6 +122,11 @@ per utskriven sida.
   listar **5 821** slugs inkl. **3 670** informationssidor (titlar utan n≥5-data –
   avsiktligt indexerbara för long-tail-SEO men ej sökbara). Slug = titel, inte
   titel×kommun. Avsiktligt; **se över efter SEO-stabiliseringen.**
+- **Redirects skuggar app-rutter:** `redirects()` i `next.config` körs FÖRE
+  app-rutterna, så en ny `page.tsx` på en URL som redan har en redirect renderas
+  aldrig (redirecten vinner alltid). Ta bort redirect-raden samtidigt som sidan
+  skapas. Kvarvarande regler som kan fånga nya sidor: `/utgivningsbevis`,
+  `/cookies`, `/arbetsgivare-journalister`, `/loner/:slug` (wildcard).
 
 ## Utgivningsbevis (nr 2024-077, giltigt t.o.m. 2034-10-28) – systemkrav
 
