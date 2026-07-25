@@ -88,7 +88,13 @@ async function fulfill(session: Stripe.Checkout.Session): Promise<void> {
 
   if (inserted && inserted.length > 0) {
     // Nyskapad betald rad → leverera.
-    await deliverEmail(inserted[0].email, inserted[0].report_token, inserted[0].expires_at);
+    await deliverEmail(
+      inserted[0].email,
+      inserted[0].report_token,
+      inserted[0].expires_at,
+      session.id,
+      new Date(),
+    );
     return;
   }
 
@@ -136,7 +142,13 @@ async function fulfill(session: Stripe.Checkout.Session): Promise<void> {
     throw updErr;
   }
   if (upgraded && upgraded.length > 0) {
-    await deliverEmail(upgraded[0].email, upgraded[0].report_token, upgraded[0].expires_at);
+    await deliverEmail(
+      upgraded[0].email,
+      upgraded[0].report_token,
+      upgraded[0].expires_at,
+      session.id,
+      new Date(),
+    );
   }
 }
 
@@ -176,12 +188,16 @@ async function deliverEmail(
   email: string | null,
   token: string | null,
   expiresAt: string | null,
+  orderRef: string,
+  purchaseDate: Date,
 ): Promise<void> {
   if (!email || !token || !expiresAt) return;
   const res = await sendReportEmail({
     to: email,
     token,
     expiresAt: new Date(expiresAt),
+    orderRef,
+    purchaseDate,
   });
   if (!res.ok) {
     console.error(`[stripe-webhook] Postmark-fel:`, res.error);

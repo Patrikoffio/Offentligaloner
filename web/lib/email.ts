@@ -1,7 +1,7 @@
 // Postmark-utskick (ENDAST server-side) via HTTP-API – ingen extra dependency.
 // Samma Postmark-konto som gamla sajten; avsändare no-reply@offentligaloner.se.
 // POSTMARK_SERVER_TOKEN får aldrig NEXT_PUBLIC-prefix.
-import { reportUrl } from "./site";
+import { reportUrl, siteUrl } from "./site";
 
 const POSTMARK_URL = "https://api.postmarkapp.com/email";
 
@@ -64,9 +64,13 @@ export async function sendReportEmail(opts: {
   to: string;
   token: string;
   expiresAt: Date;
+  orderRef: string;
+  purchaseDate: Date;
 }): Promise<SendResult> {
   const url = reportUrl(opts.token);
   const expiry = formatDate(opts.expiresAt);
+  const purchased = formatDate(opts.purchaseDate);
+  const kopvillkorUrl = `${siteUrl()}/kopvillkor`;
 
   const htmlBody = `
     <div style="font-family:Arial,Helvetica,sans-serif;color:#111;line-height:1.5">
@@ -90,6 +94,25 @@ export async function sendReportEmail(opts: {
         Om knappen inte fungerar, kopiera denna adress till webbläsaren:<br>
         <span style="word-break:break-all">${url}</span>
       </p>
+
+      <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+      <h3 style="font-size:14px;margin:0 0 8px">Orderbekräftelse</h3>
+      <table style="font-size:13px;color:#333;border-collapse:collapse">
+        <tr><td style="padding:2px 14px 2px 0;color:#777">Köpdatum</td><td>${purchased}</td></tr>
+        <tr><td style="padding:2px 14px 2px 0;color:#777">Orderreferens</td><td style="word-break:break-all">${opts.orderRef}</td></tr>
+        <tr><td style="padding:2px 14px 2px 0;color:#777">Produkt</td><td>Lönerapport (digital), levererad direkt</td></tr>
+        <tr><td style="padding:2px 14px 2px 0;color:#777">Pris</td><td>99 kr inkl. moms</td></tr>
+      </table>
+      <p style="font-size:13px;color:#555;margin-top:12px">
+        Du har samtyckt till att rapporten levereras omedelbart och bekräftat att
+        ångerrätten därmed går förlorad när tjänsten fullgjorts. Köpet omfattas av
+        våra <a href="${kopvillkorUrl}">köpvillkor</a>.
+      </p>
+      <p style="font-size:13px;color:#555">
+        Vi lämnar ändå 30 dagars nöjd-kund-garanti: är du inte nöjd, mejla
+        <a href="mailto:kontakt@offentligaloner.se">kontakt@offentligaloner.se</a>
+        inom 30 dagar från köpet så får du pengarna tillbaka.
+      </p>
       <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
       <p style="font-size:12px;color:#888">
         Offentliga löner, offentligaloner.se · Utgivningsbevis nr 2024-077.
@@ -108,6 +131,19 @@ export async function sendReportEmail(opts: {
     url,
     "",
     `Länken är giltig t.o.m. ${expiry}. Spara den – den fungerar utan inloggning.`,
+    "",
+    "--- Orderbekräftelse ---",
+    `Köpdatum: ${purchased}`,
+    `Orderreferens: ${opts.orderRef}`,
+    "Produkt: Lönerapport (digital), levererad direkt",
+    "Pris: 99 kr inkl. moms",
+    "",
+    "Du har samtyckt till att rapporten levereras omedelbart och bekräftat att " +
+      "ångerrätten därmed går förlorad när tjänsten fullgjorts. Köpet omfattas av " +
+      `våra köpvillkor: ${kopvillkorUrl}`,
+    "",
+    "Vi lämnar ändå 30 dagars nöjd-kund-garanti: är du inte nöjd, mejla " +
+      "kontakt@offentligaloner.se inom 30 dagar från köpet så får du pengarna tillbaka.",
     "",
     "Offentliga löner, offentligaloner.se · Utgivningsbevis nr 2024-077.",
   ].join("\n");
