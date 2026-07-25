@@ -91,6 +91,10 @@ export default function HomeTop({
         Faktiska löner från kommuner och regioner, utlämnade enligt
         offentlighetsprincipen. Inga enkäter, inga uppskattningar.
       </p>
+      <p className="text-gray-400 text-center max-w-xl mx-auto mt-2 text-xs leading-relaxed">
+        Utlämnade av {nf(count_employers)} kommuner och regioner under 2024 års
+        insamling. Publicerad under utgivningsbevis nr 2024-077.
+      </p>
 
       {/* Sökfält */}
       <div className="relative mt-8" id="sok">

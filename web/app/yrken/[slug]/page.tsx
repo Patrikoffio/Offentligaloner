@@ -463,6 +463,13 @@ export default async function YrkeSida({
       {/* Lönedistribution */}
       {national && (
         <section className="mb-10">
+          <p className="border-l-[3px] border-brand pl-3 mb-4 text-sm text-gray-600 max-w-2xl">
+            Faktiska, utbetalda löner – utlämnade av arbetsgivarna enligt
+            offentlighetsprincipen, inte enkätsvar eller uppskattningar. Underlaget
+            kommer från {sourceList.length} arbetsgivare
+            {sourceCitationRange ? `, ${sourceCitationRange}` : ` ${year}`} och
+            publiceras under utgivningsbevis nr 2024-077.
+          </p>
           <h2 className="text-xl font-semibold mb-1">
             Löner {year} — {national.n.toLocaleString("sv-SE")} anställda
           </h2>

@@ -165,6 +165,38 @@ export default function OrderReport({
         )}
       </div>
 
+      {/* Vad du får för 99 kr – faktaunderlag inför lönesamtalet. Punkterna
+          beskriver endast innehåll som faktiskt finns i rapportmallen. */}
+      <div className="rounded-lg bg-plate-blue p-4 mb-4 text-sm text-gray-700">
+        <p className="font-medium text-gray-900 mb-2">
+          Ett faktaunderlag att ta med till lönesamtalet
+        </p>
+        <ul className="space-y-1.5 list-disc pl-5">
+          <li>Upp till 5 yrken och 5 kommuner/regioner i en samlad rapport.</li>
+          <li>
+            Nationell lönespridning per yrke – median och percentiler (10:e–90:e),
+            där var fjärde tjänar mer än 75:e percentilen.
+          </li>
+          <li>
+            Din valda kommun eller region jämförd med riksmedianen, i kronor och
+            procent.
+          </li>
+          <li>
+            Tabell per vald arbetsgivare: antal anställda, median och medellön
+            (endast där minst 5 anställda finns).
+          </li>
+          <li>
+            2024 års löner, omräknade till heltidsekvivalent månadslön, med
+            källhänvisning och utlämningsdatum.
+          </li>
+          <li>Utskrivbar och sparbar som PDF. Länken är giltig i tre månader.</li>
+        </ul>
+        <p className="text-xs text-gray-500 mt-3">
+          En löneökning på 500 kr/mån är 6 000 kr på ett år – och följer med varje
+          år framåt.
+        </p>
+      </div>
+
       {/* Uttryckligt samtycke till omedelbar leverans (ångerrätten upphör).
           Krävs för att kunna slutföra köpet – gate:ar knappen nedan och
           skickas till /api/checkout som validerar den server-side. */}

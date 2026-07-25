@@ -71,7 +71,9 @@ export async function sendReportEmail(opts: {
   const htmlBody = `
     <div style="font-family:Arial,Helvetica,sans-serif;color:#111;line-height:1.5">
       <h2 style="margin:0 0 12px">Din lönerapport är klar</h2>
-      <p>Tack för ditt köp. Din rapport finns här:</p>
+      <p>Tack för ditt köp. Rapporten bygger på faktiska, utlämnade löner enligt
+        offentlighetsprincipen – ett faktaunderlag att ta med till lönesamtalet.</p>
+      <p>Din rapport finns här:</p>
       <p style="margin:20px 0">
         <a href="${url}"
            style="background:#2563eb;color:#fff;text-decoration:none;
@@ -99,7 +101,10 @@ export async function sendReportEmail(opts: {
   const textBody = [
     "Din lönerapport är klar",
     "",
-    "Tack för ditt köp. Öppna rapporten här:",
+    "Tack för ditt köp. Rapporten bygger på faktiska, utlämnade löner enligt " +
+      "offentlighetsprincipen – ett faktaunderlag att ta med till lönesamtalet.",
+    "",
+    "Öppna rapporten här:",
     url,
     "",
     `Länken är giltig t.o.m. ${expiry}. Spara den – den fungerar utan inloggning.`,

@@ -164,6 +164,11 @@ export async function POST(req: Request): Promise<Response> {
     // Ångerrätts-waiver: digital tjänst som levereras omedelbart.
     consent_collection: { terms_of_service: "required" },
     custom_text: {
+      submit: {
+        message:
+          "Faktaunderlag för lönesamtalet: utlämnade löner från kommuner och " +
+          "regioner enligt offentlighetsprincipen, inte enkätsvar.",
+      },
       terms_of_service_acceptance: {
         message:
           "Rapporten är en digital tjänst som levereras direkt efter köp. Genom att " +
