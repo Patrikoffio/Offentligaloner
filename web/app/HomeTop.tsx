@@ -18,7 +18,7 @@ const STEPS = [
   },
   {
     n: 3,
-    title: "Få din lönerapport på mejlen – 39 kr",
+    title: "Få din lönerapport på mejlen – 99 kr",
     body: () => "betala med Klarna eller kort.",
   },
 ];

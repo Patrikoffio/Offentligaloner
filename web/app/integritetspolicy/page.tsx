@@ -125,11 +125,9 @@ export default function Integritetspolicy() {
             <strong>Vercel / Supabase</strong> – drift och lagring (EU-region).
           </li>
         </ul>
-        {/* TODO: bekräfta att personuppgiftsbiträdesavtal (DPA) finns med samtliga
-            biträden ovan, och komplettera listan om fler tjänster tillkommer. */}
-        <p className="text-sm text-gray-500">
-          TODO: bekräfta att personuppgiftsbiträdesavtal finns med samtliga
-          biträden ovan.
+        <p>
+          Med samtliga dessa biträden finns personuppgiftsbiträdesavtal som
+          reglerar behandlingen för vår räkning.
         </p>
       </Section>
 

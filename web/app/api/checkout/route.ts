@@ -1,5 +1,5 @@
 // Skapar en Stripe Checkout Session SERVER-SIDE. Klienten skickar valda slugs;
-// pris (39 kr) och betalmetoder bestäms här, aldrig i klienten.
+// pris (99 kr) och betalmetoder bestäms här, aldrig i klienten.
 //
 // Validering (hård regel 1): varje vald slug måste ha publicerbar nationell
 // statistik (n≥5 i title_national_stats). Titlar utan underlag kan inte köpas –

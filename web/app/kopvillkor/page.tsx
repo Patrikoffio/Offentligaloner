@@ -86,17 +86,8 @@ export default function Kopvillkor() {
 
       <Section title="Pris och moms">
         <p>
-          Rapporten kostar <strong>39 kr inkl. moms</strong>. Priset anges i
+          Rapporten kostar <strong>99 kr inkl. moms</strong>. Priset anges i
           svenska kronor och är ett engångsköp – ingen prenumeration.
-        </p>
-        {/* TODO: bekräfta momsstatus. Stripe-priset (price_1QGSQ3…) har automatic_tax
-            aktiverat; verifiera att priset är konfigurerat som momsinkluderande och
-            att momssatsen för digitala tjänster (25 %) tillämpas. Om säljaren inte är
-            momsregistrerad ska texten ovan ändras (t.ex. "Priset är 39 kr. Momsen
-            ingår ej – säljaren är inte momsregistrerad"). */}
-        <p className="text-sm text-gray-500">
-          TODO: bekräfta momssats och att säljaren är momsregistrerad innan
-          publicering; justera formuleringen ovan därefter.
         </p>
       </Section>
 
@@ -117,16 +108,9 @@ export default function Kopvillkor() {
           e-post.
         </p>
         <p>
-          Vid kortbetalning sker detta i regel omedelbart. Väljer du Klarna kan
-          bekräftelsen dröja en kort stund – rapporten skickas så snart Klarna
+          Vid kortbetalning sker detta normalt inom några minuter. Väljer du
+          Klarna kan bekräftelsen dröja – rapporten skickas så snart Klarna
           bekräftat betalningen.
-        </p>
-        {/* TODO: bekräfta/precisera leveranstidsutfästelse (t.ex. "inom några minuter",
-            "senast inom 1 timme"). Formuleringen ovan är avsiktligt öppen tills en
-            konkret utfästelse fastställts. */}
-        <p className="text-sm text-gray-500">
-          TODO: fastställ en konkret leveranstid att utlova (t.ex. ”inom några
-          minuter”).
         </p>
       </Section>
 
@@ -174,12 +158,7 @@ export default function Kopvillkor() {
             kontakt@offentligaloner.se
           </a>{" "}
           från, eller med uppgift om, den e-postadress du använde vid köpet.
-          Återbetalning görs till samma betalmedel via Stripe.
-        </p>
-        {/* TODO: ange handläggningstid för återbetalning (t.ex. "inom 14 dagar"). */}
-        <p className="text-sm text-gray-500">
-          TODO: ange inom vilken tid återbetalning behandlas (t.ex. ”inom 14
-          dagar”).
+          Återbetalning görs till samma betalmedel via Stripe inom 5 arbetsdagar.
         </p>
       </Section>
 
@@ -198,15 +177,6 @@ export default function Kopvillkor() {
             rel="noopener noreferrer"
           >
             arn.se
-          </a>
-          . Du kan även använda EU-kommissionens plattform för tvistlösning online:{" "}
-          <a
-            href="https://ec.europa.eu/consumers/odr"
-            className="text-brand-mid hover:underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            ec.europa.eu/consumers/odr
           </a>
           .
         </p>

@@ -17,7 +17,7 @@ const MAX_TITLES = 5;
 const MAX_EMPLOYERS = 5;
 const CONTACT_EMAIL = "kontakt@offentligaloner.se";
 
-// Beställningskomponent (39 kr): två urvalssteg med samma chips-mönster.
+// Beställningskomponent (99 kr): två urvalssteg med samma chips-mönster.
 //  (a) yrken – snabbval + sökfält med autocomplete (n≥5).
 //  (b) kommuner/regioner – sökfält med autocomplete över arbetsgivare.
 // Klientstate; pris och validering bestäms server-side i /api/checkout.
@@ -110,7 +110,7 @@ export default function OrderReport({
         Välj upp till {MAX_TITLES} yrken och upp till {MAX_EMPLOYERS} kommuner/regioner.
         Du får en samlad, PDF-vänlig rapport (giltig i tre månader) med nationell
         lönespridning och statistik för dina valda arbetsgivare.
-        <span className="font-medium"> 39 kr.</span>
+        <span className="font-medium"> 99 kr.</span>
       </p>
 
       {/* ── Steg (a): yrken ───────────────────────────────────────────────── */}
@@ -202,7 +202,7 @@ export default function OrderReport({
         }
         className="bg-brand text-white text-sm px-5 py-2.5 rounded-lg hover:opacity-90 disabled:opacity-50"
       >
-        {loading ? "Öppnar betalning…" : "Beställ lönerapport (39 kr)"}
+        {loading ? "Öppnar betalning…" : "Beställ lönerapport (99 kr)"}
       </button>
 
       <PaymentTrust logos={paymentLogos} />

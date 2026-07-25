@@ -1,7 +1,7 @@
 // Tokenserad lönerapport. Token = access (ingen inloggning). Innehåll byggs
 // ENBART ur matviews (n≥5). Ingen individdata. Print-CSS, utgångsdatum i mejlet.
 //
-// Produkt (39 kr): max 5 yrken × max 5 valda kommuner/regioner. Per yrke visas
+// Produkt (99 kr): max 5 yrken × max 5 valda kommuner/regioner. Per yrke visas
 // nationell spridning som referens + tabellrader ENDAST för de valda
 // arbetsgivarna (n≥5-regeln oförändrad). Datainnehållet är oförändrat mot
 // tidigare – detta är rendering/CSS.

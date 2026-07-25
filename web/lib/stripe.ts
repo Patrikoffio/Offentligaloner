@@ -18,12 +18,15 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
-// Priset ligger i Stripe (39 kr). Id byts test↔prod via env:
-//   test:  price_1TwOjJLNrfBYc0easXBKp8ih
-//   prod:  price_1QGSQ3LNrfBYc0eaEvsidyX0
+// Priset ligger i Stripe (99 kr). Id byts test↔prod via env STRIPE_PRICE_ID.
+// OBS: id:na nedan avser det tidigare 39 kr-priset och MÅSTE ersättas med en
+// 99 kr-price i Stripe (test + prod) – annars debiteras fel belopp:
+//   gammalt test:  price_1TwOjJLNrfBYc0easXBKp8ih  (39 kr)
+//   gammalt prod:  price_1QGSQ3LNrfBYc0eaEvsidyX0  (39 kr)
 // Läses lazily så bygget aldrig kräver värdet.
 export function stripePriceId(): string {
   return process.env.STRIPE_PRICE_ID ?? "";
 }
 
-export const RAPPORT_PRIS_SEK = 39;
+// Registreras som amount_sek på köp-raden (webhooken). Ska spegla Stripe-priset.
+export const RAPPORT_PRIS_SEK = 99;
