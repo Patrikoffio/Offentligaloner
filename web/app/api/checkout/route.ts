@@ -30,6 +30,19 @@ export async function POST(req: Request): Promise<Response> {
     return NextResponse.json({ error: "Ogiltig begäran." }, { status: 400 });
   }
 
+  // Uttryckligt samtycke till omedelbar leverans (ångerrätten upphör) krävs för
+  // att slutföra köpet. Klienten gate:ar knappen; här är den bindande grinden.
+  const consent = (body as { consent?: unknown })?.consent === true;
+  if (!consent) {
+    return NextResponse.json(
+      {
+        error:
+          "Samtycke till omedelbar leverans krävs för att genomföra köpet.",
+      },
+      { status: 400 },
+    );
+  }
+
   const rawSlugs = (body as { slugs?: unknown })?.slugs;
   const rawEmployers = (body as { employers?: unknown })?.employers;
   if (!Array.isArray(rawSlugs)) {

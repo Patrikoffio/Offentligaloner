@@ -68,6 +68,10 @@ export default function RootLayout({
                 Tillhandahållare och ansvarig utgivare:{" "}
                 <strong>Patrik Larsson</strong>
               </p>
+              {/* TODO: fyll i organisationsnummer och postadress. */}
+              <p>
+                Organisationsnummer: TODO · Postadress: TODO
+              </p>
               <p>
                 Utgivningsbevis nr 2024-077, giltigt t.o.m. 2034-10-28
                 (Mediemyndigheten)
@@ -80,6 +84,17 @@ export default function RootLayout({
               <p className="pt-1">
                 <Link href="/om-tjansten" className="text-brand-mid hover:underline">
                   Om tjänsten
+                </Link>{" "}
+                ·{" "}
+                <Link href="/kopvillkor" className="text-brand-mid hover:underline">
+                  Köpvillkor
+                </Link>{" "}
+                ·{" "}
+                <Link
+                  href="/integritetspolicy"
+                  className="text-brand-mid hover:underline"
+                >
+                  Integritetspolicy
                 </Link>{" "}
                 ·{" "}
                 <a

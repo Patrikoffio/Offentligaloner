@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { PaymentTrust, type PaymentLogo } from "@/components/PaymentTrust";
 
 export interface TitleOption {
@@ -37,6 +38,7 @@ export default function OrderReport({
     { slug: defaultSlug, title: defaultTitle },
   ]);
   const [emps, setEmps] = useState<EmployerOption[]>([]);
+  const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,6 +71,10 @@ export default function OrderReport({
   async function order() {
     if (titles.length === 0) return setError("Välj minst ett yrke.");
     if (emps.length === 0) return setError("Välj minst en kommun/region.");
+    if (!consent)
+      return setError(
+        "Bekräfta samtycket till omedelbar leverans för att slutföra köpet.",
+      );
     setLoading(true);
     setError(null);
     try {
@@ -78,6 +84,7 @@ export default function OrderReport({
         body: JSON.stringify({
           slugs: titles.map((t) => t.slug),
           employers: emps.map((e) => e.id),
+          consent,
         }),
       });
       const data = (await res.json()) as { url?: string; error?: string };
@@ -158,11 +165,41 @@ export default function OrderReport({
         )}
       </div>
 
+      {/* Uttryckligt samtycke till omedelbar leverans (ångerrätten upphör).
+          Krävs för att kunna slutföra köpet – gate:ar knappen nedan och
+          skickas till /api/checkout som validerar den server-side. */}
+      <label className="flex items-start gap-2 mb-4 text-xs text-gray-600">
+        <input
+          type="checkbox"
+          checked={consent}
+          onChange={(e) => {
+            setConsent(e.target.checked);
+            if (e.target.checked) setError(null);
+          }}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
+        />
+        <span>
+          Jag samtycker till att rapporten (en digital tjänst) levereras omedelbart
+          och är införstådd med att ångerrätten därmed går förlorad. Jag har tagit
+          del av{" "}
+          <Link href="/kopvillkor" className="text-brand-mid hover:underline">
+            köpvillkoren
+          </Link>{" "}
+          och{" "}
+          <Link href="/integritetspolicy" className="text-brand-mid hover:underline">
+            integritetspolicyn
+          </Link>
+          .
+        </span>
+      </label>
+
       {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
 
       <button
         onClick={order}
-        disabled={loading || titles.length === 0 || emps.length === 0}
+        disabled={
+          loading || titles.length === 0 || emps.length === 0 || !consent
+        }
         className="bg-brand text-white text-sm px-5 py-2.5 rounded-lg hover:opacity-90 disabled:opacity-50"
       >
         {loading ? "Öppnar betalning…" : "Beställ lönerapport (39 kr)"}
