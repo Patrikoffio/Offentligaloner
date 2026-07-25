@@ -47,10 +47,9 @@ export default function Integritetspolicy() {
           Ansvarig för behandlingen av personuppgifter vid köp är{" "}
           <strong>Patrik Larsson</strong>.
         </p>
-        {/* TODO: fyll i organisationsnummer och postadress för personuppgiftsansvarig. */}
         <ul className="list-disc pl-5 space-y-1">
-          <li>Organisationsnummer: TODO – fyll i organisationsnummer</li>
-          <li>Postadress: TODO – fyll i postadress</li>
+          <li>Organisationsnummer: 19890405-4676</li>
+          <li>Postadress: Tunnerbohult Marieslätt, 333 92 Broaryd</li>
           <li>
             E-post:{" "}
             <a

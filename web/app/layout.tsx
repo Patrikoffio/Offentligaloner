@@ -68,9 +68,9 @@ export default function RootLayout({
                 Tillhandahållare och ansvarig utgivare:{" "}
                 <strong>Patrik Larsson</strong>
               </p>
-              {/* TODO: fyll i organisationsnummer och postadress. */}
               <p>
-                Organisationsnummer: TODO · Postadress: TODO
+                Organisationsnummer: 19890405-4676 · Postadress: Tunnerbohult
+                Marieslätt, 333 92 Broaryd
               </p>
               <p>
                 Utgivningsbevis nr 2024-077, giltigt t.o.m. 2034-10-28
