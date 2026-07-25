@@ -88,7 +88,7 @@ export default function OmTjansten() {
             alt="Patrik Larsson, ansvarig utgivare"
             width={96}
             height={96}
-            className="hidden sm:block shrink-0 h-24 w-24 rounded-full object-cover border border-gray-200"
+            className="block shrink-0 h-20 w-20 sm:h-24 sm:w-24 rounded-full object-cover border border-gray-200"
           />
           <div className="space-y-3">
             <p>
