@@ -544,7 +544,8 @@ export default async function YrkeSida({
               <span className="text-accent-strong">
                 {formatSalary(medianSpread)}
               </span>{" "}
-              i månaden för {title.title} – samma yrke, olika arbetsgivare.
+              i månaden för {title.title} – samma yrke, olika arbetsgivare.{" "}
+              Vet du var du ligger?
             </p>
           )}
 
@@ -575,7 +576,6 @@ export default async function YrkeSida({
             defaultTitle={title.title}
             titleCandidates={orderCandidates}
             employers={allEmployers}
-            medianSpread={medianSpread}
             paymentLogos={availablePaymentLogos()}
           />
         </>
