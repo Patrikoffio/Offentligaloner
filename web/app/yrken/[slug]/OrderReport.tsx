@@ -243,7 +243,11 @@ export default function OrderReport({
         }
         className="bg-brand text-white text-sm px-5 py-2.5 rounded-lg hover:opacity-90 disabled:opacity-50"
       >
-        {loading ? "Öppnar betalning…" : "Beställ lönerapport (99 kr)"}
+        {loading
+          ? "Öppnar betalning…"
+          : emps.length === 0
+            ? "Välj kommun för att beställa"
+            : "Beställ lönerapport (99 kr)"}
       </button>
 
       <PaymentTrust logos={paymentLogos} />
