@@ -15,19 +15,19 @@ export default function SiteHeader() {
         </Link>
         <nav className="flex items-center gap-1 text-sm">
           <Link
-            href="/om-tjansten"
+            href="/#sok"
             className="text-gray-600 hover:text-brand px-2 py-1 rounded transition-colors"
           >
-            Om tjänsten
+            Beställ rapport
           </Link>
           <span aria-hidden className="text-gray-300">
             ·
           </span>
           <Link
-            href="/#sok"
+            href="/om-tjansten"
             className="text-gray-600 hover:text-brand px-2 py-1 rounded transition-colors"
           >
-            Beställ rapport
+            Om tjänsten
           </Link>
         </nav>
       </div>
