@@ -173,7 +173,7 @@ export default function DistributionBand({
       </div>
 
       <figcaption className="text-xs text-gray-500 mt-1">
-        Det mörkblå bandet visar var hälften av alla löner ligger:{" "}
+        Det mörka bandet visar var hälften av alla löner ligger:{" "}
         <span className="tnum">
           {formatSalary(p25)}–{formatSalary(p75)}
         </span>
