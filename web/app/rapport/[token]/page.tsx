@@ -12,6 +12,7 @@ import { buildReport, type ReportTitle } from "@/lib/report";
 import { METHOD_NOTE } from "@/lib/copy";
 import Logo from "@/components/Logo";
 import DistributionBand from "@/components/DistributionBand";
+import IndividualPlacement from "./IndividualPlacement";
 import PrintButton from "./PrintButton";
 
 export const runtime = "nodejs";
@@ -87,6 +88,13 @@ function TitleSection({
   // Primär kommun = den med störst underlag bland de valda (buildReport
   // sorterar n desc). Övriga hamnar i tabellen.
   const primary = t.employers[0] ?? null;
+
+  // Primära kommunens placering bland samtliga arbetsgivare (n≥5) efter medianlön.
+  // Löneoberoende aggregat – kundens egen lön ingår aldrig i denna beräkning.
+  const kommunTotal = t.allEmployerMedians.length || null;
+  const kommunRank = primary
+    ? t.allEmployerMedians.filter((m) => m > primary.median).length + 1
+    : null;
 
   // Underrad: valda kommuner/regioner för yrket (de med data först, annars val).
   const kommunLabel =
@@ -247,6 +255,21 @@ function TitleSection({
           {t.emptyEmployers.join(", ")}.
         </p>
       )}
+
+      {/* Individualiserad placering – renderas ENDAST om kunden angav en egen lön
+          (läses klientsidan ur sessionStorage; når aldrig servern/databasen). */}
+      <IndividualPlacement
+        title={t.title}
+        p10={n.p10}
+        p25={n.p25}
+        median={n.median}
+        p75={n.p75}
+        p90={n.p90}
+        kommunName={primary?.employer_name ?? null}
+        kommunMedian={primary?.median ?? null}
+        kommunRank={kommunRank}
+        kommunTotal={kommunTotal}
+      />
 
       {/* Inför din löneförhandling */}
       <div className="border-l-[3px] border-brand pl-4 my-6 break-inside-avoid">

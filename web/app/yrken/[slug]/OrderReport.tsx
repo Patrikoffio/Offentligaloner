@@ -41,6 +41,21 @@ export default function OrderReport({
   const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Valfri egen lön för individualiserad placering. DATASKYDD: värdet skickas
+  // ALDRIG till servern och sparas ALDRIG i databasen – det lagras bara i
+  // webbläsarens sessionStorage och läses av rapportsidan klientsidan. Ingår
+  // därför inte i /api/checkout-anropet nedan.
+  const [ownSalary, setOwnSalary] = useState("");
+  useEffect(() => {
+    const digits = ownSalary.replace(/\D/g, "");
+    try {
+      if (digits && Number(digits) > 0)
+        sessionStorage.setItem("offlon:egen_lon", digits);
+      else sessionStorage.removeItem("offlon:egen_lon");
+    } catch {
+      /* sessionStorage kan saknas – uppgiften utelämnas då bara ur rapporten */
+    }
+  }, [ownSalary]);
 
   const titleSlugs = new Set(titles.map((t) => t.slug));
   const empIds = new Set(emps.map((e) => e.id));
@@ -163,6 +178,34 @@ export default function OrderReport({
         {empsFull && (
           <p className="text-xs text-gray-400 mt-1">Max {MAX_EMPLOYERS} kommuner/regioner valda.</p>
         )}
+      </div>
+
+      {/* ── Valfritt: egen lön för individualiserad placering ─────────────────
+          Lagras bara i din webbläsare (sessionStorage), skickas aldrig till oss. */}
+      <div className="mb-6">
+        <label
+          htmlFor="egenlon"
+          className="block text-sm font-medium text-gray-800 mb-2"
+        >
+          Vad tjänar du i dag?{" "}
+          <span className="font-normal text-gray-400">
+            (valfritt – visas bara i din rapport)
+          </span>
+        </label>
+        <input
+          id="egenlon"
+          type="text"
+          inputMode="numeric"
+          value={ownSalary}
+          onChange={(e) => setOwnSalary(e.target.value)}
+          placeholder="t.ex. 32 500"
+          className="w-full sm:w-56 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30"
+        />
+        <p className="text-xs text-gray-400 mt-1 max-w-2xl">
+          Söker du nytt jobb? Ange i stället vilken lön du siktar på. Uppgiften
+          skickas aldrig till oss – den lagras bara i din webbläsare och används för
+          att visa din placering i rapporten.
+        </p>
       </div>
 
       {/* Vad du får för 99 kr – tre frågor läsaren ställer sig, i klarspråk.

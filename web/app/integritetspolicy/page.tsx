@@ -77,6 +77,13 @@ export default function Integritetspolicy() {
             <strong>Orderuppgifter</strong> – vilka yrken och arbetsgivare du valt,
             belopp och tidpunkt, samt en slumpad länk (token) till rapporten.
           </li>
+          <li>
+            <strong>Löneuppgift du själv anger</strong> – om du väljer att fylla i
+            vad du tjänar i dag (eller vilken lön du siktar på) för att se din egen
+            placering i rapporten. Uppgiften behandlas <strong>enbart i din
+            webbläsare</strong> när rapporten genereras – den skickas aldrig till
+            våra servrar och sparas inte i vår databas.
+          </li>
         </ul>
       </Section>
 
@@ -85,6 +92,12 @@ export default function Integritetspolicy() {
           <li>
             <strong>Leverera rapporten och ge kundservice</strong> – rättslig grund:
             fullgörande av avtalet med dig (dataskyddsförordningen art. 6.1 b).
+          </li>
+          <li>
+            <strong>Visa din egen placering i rapporten</strong> (om du anger en
+            löneuppgift) – rättslig grund: fullgörande av avtalet med dig
+            (art. 6.1 b). Uppgiften används bara när rapporten genereras och sparas
+            inte efteråt.
           </li>
           <li>
             <strong>Bokföring och redovisning</strong> – rättslig grund: rättslig

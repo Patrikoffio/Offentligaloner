@@ -28,6 +28,8 @@ export interface ReportTitle {
   employers: ReportEmployer[]; // ENDAST valda arbetsgivare med n≥5
   emptyEmployers: string[]; // valda arbetsgivare utan publicerbart underlag för yrket
   nationalSourceCount: number; // antal arbetsgivare bakom den nationella spridningen
+  allEmployerMedians: number[]; // alla arbetsgivares medianlön (n≥5), fallande – för
+  // kommunens placering i den individualiserade sektionen. Endast aggregat.
 }
 
 export interface ReportMeta {
@@ -89,6 +91,14 @@ export async function buildReport(
     .select("generalized_title_id, employer_id")
     .in("generalized_title_id", ids);
 
+  // Alla arbetsgivares medianlön (n≥5) per titel – för att placera vald kommun i
+  // den individualiserade sektionen. Endast aggregat (medianer), inga namn/individer.
+  const { data: allMedians } = await supabaseAdmin
+    .from("title_employer_stats")
+    .select("generalized_title_id, median")
+    .in("generalized_title_id", ids)
+    .gte("n", 5);
+
   const bySlug = new Map(titles.map((t) => [t.slug, t]));
 
   const result: ReportTitle[] = [];
@@ -119,6 +129,12 @@ export async function buildReport(
         .map((r: any) => r.employer_id),
     ).size;
 
+    const allEmployerMedians = (allMedians ?? [])
+      .filter((r) => r.generalized_title_id === t.id)
+      .map((r: any) => r.median as number)
+      .filter((m) => typeof m === "number")
+      .sort((a, b) => b - a);
+
     result.push({
       slug: t.slug,
       title: t.title,
@@ -127,6 +143,7 @@ export async function buildReport(
       employers,
       emptyEmployers,
       nationalSourceCount,
+      allEmployerMedians,
     });
   }
 
