@@ -1,31 +1,23 @@
-// Logotypsymbol – v1-identitetens hexagon, ren kontur i primär teal (#166F81).
-// Används i rapportens dokumenthuvud bredvid ordbilden. Samma geometri som
-// faviconen (spetsig topp/botten, lodräta sidor). Inga staplar/triangel och
-// inga brokiga v1-logofärger – de lever bara i den fulla logotypfilen.
+// Logotyp – v1-identiteten (symbol + ordbild) som INLINE-SVG. Inline är ett krav:
+// loggan renderas bl.a. i lönerapportens dokumenthuvud, som är en utskrifts-/PDF-
+// produkt där en <img>-SVG inte är garanterad i tryck. Själva SVG-strängen ligger
+// i logo-svg.ts (enda logokällan i komponentform) så en logga-/palettändring blir
+// en filändring där, utan att röra den här komponenten.
+//
+// LOGO_SVG är en statisk sträng ur egen kodbas (aldrig användardata) – därför är
+// dangerouslySetInnerHTML säkert här. Storlek styrs via className på wrappern;
+// den inre svg:n fyller höjden och behåller sitt bredd/höjd-förhållande.
+import { LOGO_SVG } from "./logo-svg";
 
-export default function Logo({
-  size = 32,
-  className,
-}: {
-  size?: number;
-  className?: string;
-}) {
+export default function Logo({ className }: { className?: string }) {
   return (
-    <svg
-      width={size}
-      height={(size * 64) / 56}
-      viewBox="0 0 56 64"
-      className={className}
+    <span
+      className={`inline-block [&>svg]:block [&>svg]:h-full [&>svg]:w-auto${
+        className ? ` ${className}` : ""
+      }`}
       role="img"
       aria-label="Offentliga löner"
-    >
-      <polygon
-        points="28,4 52.25,18 52.25,46 28,60 3.75,46 3.75,18"
-        fill="none"
-        stroke="#166F81"
-        strokeWidth="6"
-        strokeLinejoin="round"
-      />
-    </svg>
+      dangerouslySetInnerHTML={{ __html: LOGO_SVG }}
+    />
   );
 }

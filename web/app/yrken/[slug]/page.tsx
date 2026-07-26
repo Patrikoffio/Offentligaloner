@@ -506,9 +506,9 @@ export default async function YrkeSida({
 
           <div className="space-y-3">
             {distribution.map(({ label, value, highlight }) => (
-              <div key={label} className="flex items-center gap-3">
+              <div key={label} className="flex items-center gap-2 sm:gap-3">
                 <span
-                  className={`w-44 text-sm text-right shrink-0 ${
+                  className={`w-32 sm:w-44 text-sm text-right shrink-0 ${
                     highlight ? "font-semibold" : "text-gray-600"
                   }`}
                 >
@@ -523,7 +523,7 @@ export default async function YrkeSida({
                   />
                 </div>
                 <span
-                  className={`w-28 text-sm ${
+                  className={`w-20 sm:w-28 shrink-0 text-sm ${
                     highlight ? "font-semibold" : "text-gray-700"
                   }`}
                 >

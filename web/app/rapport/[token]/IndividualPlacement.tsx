@@ -111,8 +111,10 @@ export default function IndividualPlacement({
   }
 
   // Kommunens placering bland samtliga arbetsgivare (löneoberoende fakta).
+  // Endast när det finns >1 arbetsgivare – "1:a högsta av 1 arbetsgivare" är
+  // meningslöst (punkt A1).
   const rankLine =
-    kommunName && kommunRank != null && kommunTotal != null && kommunTotal > 0
+    kommunName && kommunRank != null && kommunTotal != null && kommunTotal > 1
       ? `${kommunName} har den ${ord(kommunRank)} högsta medianlönen av ${kommunTotal} arbetsgivare som redovisat ${title}.`
       : null;
 

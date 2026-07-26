@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 import { supabaseAdmin } from "@/lib/supabase";
 import { buildReport, type ReportTitle } from "@/lib/report";
 import { METHOD_NOTE } from "@/lib/copy";
-import Logo from "@/components/Logo";
+import Logo from "@/components/Logo"; // enda logokällan (inline, symbol + ordbild)
 import DistributionBand from "@/components/DistributionBand";
 import IndividualPlacement from "./IndividualPlacement";
 import PrintButton from "./PrintButton";
@@ -203,7 +203,7 @@ function TitleSection({
               className="pb-1.5 pr-4 font-medium text-right"
               style={{ borderTop: "1.5px solid #13201F" }}
             >
-              Antal
+              Anställda
             </th>
             <th
               className="pb-1.5 pr-4 font-medium text-right"
@@ -287,10 +287,10 @@ function TitleSection({
 
       {/* Källhänvisning per titel */}
       <p className="text-xs text-gray-400 mt-4">
-        Källa: uppgifter utlämnade enligt offentlighetsprincipen. Nationell
-        spridning bygger på samtliga {t.nationalSourceCount} arbetsgivare som
-        lämnat ut uppgifter för yrket {n.collection_year}; arbetsgivartabellen
-        visar dina valda arbetsgivare med minst 5 anställda.
+        Källa: uppgifter utlämnade enligt offentlighetsprincipen,{" "}
+        {n.collection_year}. {t.nationalSourceCount} arbetsgivare lämnade
+        uppgifter för yrket och ligger bakom de nationella siffrorna. Tabellen
+        ovan visar bara de arbetsgivare som har minst 5 anställda i yrket.
       </p>
     </section>
   );
@@ -351,10 +351,7 @@ export default async function RapportSida({
 
       {/* Dokumenthuvud */}
       <header className="flex items-end justify-between gap-4 pb-3 border-b border-gray-900">
-        <div className="flex items-center gap-2.5">
-          <Logo size={28} />
-          <span className="text-brand font-medium">offentligaloner.se</span>
-        </div>
+        <Logo className="h-7 w-auto" />
         <div className="text-right">
           <div className="text-[10px] uppercase tracking-wide text-gray-400">
             Rapportdatum

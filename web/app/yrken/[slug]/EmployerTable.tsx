@@ -75,7 +75,7 @@ export default function EmployerTable({
           <thead>
             <tr className="border-b border-gray-200 text-left text-gray-500">
               <th className="pb-2 pr-4 font-medium">Arbetsgivare</th>
-              <th className="pb-2 pr-4 font-medium text-right">Antal</th>
+              <th className="pb-2 pr-4 font-medium text-right">Anställda</th>
               <th className="pb-2 pr-4 font-medium text-right">Median</th>
               <th className="pb-2 font-medium text-right">Medellön</th>
             </tr>
