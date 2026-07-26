@@ -12,6 +12,7 @@ import OrderReport, {
   type TitleOption,
   type EmployerOption,
 } from "./OrderReport";
+import EmployerTable from "./EmployerTable";
 import { availablePaymentLogos } from "@/lib/paymentLogos";
 
 // ─── Typer ──────────────────────────────────────────────────────────────────
@@ -210,14 +211,15 @@ export default async function YrkeSida({
   let allEmployers: EmployerOption[] = [];
 
   if (national) {
-    // Hämta per-arbetsgivare statistik
+    // Hämta per-arbetsgivare statistik. Hämtar ALLA n≥5-arbetsgivare (inte bara 20)
+    // så arbetsgivartabellens expander kan visa hela listan. n≥5-regeln oförändrad.
     const { data: employerStatsDirect } = await supabaseAdmin
       .from("title_employer_stats")
       .select("employer_id, n, median, mean_salary, employers(name)")
       .eq("generalized_title_id", title.id)
       .gte("n", 5)
       .order("n", { ascending: false })
-      .limit(20);
+      .limit(1000);
 
     employerList.push(
       ...(employerStatsDirect ?? []).map((r: any) => ({
@@ -351,7 +353,9 @@ export default async function YrkeSida({
   // titeln räknas, så små underlag inte ger ett orimligt tal. Färre än 5
   // kvalificerade → ingen rad (medianSpread = null). Redovisas som skillnad,
   // aldrig som möjlighet.
-  const spreadQualified = employerList.filter(
+  // Beräknas på samma underlag som tidigare (de 20 arbetsgivarna med störst
+  // underlag) så rubrikvärdet är oförändrat trots att tabellen nu hämtar alla.
+  const spreadQualified = employerList.slice(0, 20).filter(
     (e) => e.n >= 20 && e.median != null,
   );
   const medianSpread =
@@ -585,49 +589,20 @@ export default async function YrkeSida({
       {(employerList.length > 0 || smallEmployers.length > 0) && (
         <section className="mb-10">
           <h2 className="text-xl font-semibold mb-4">Per arbetsgivare</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr className="border-b border-gray-200 text-left text-gray-500">
-                  <th className="pb-2 pr-4 font-medium">Arbetsgivare</th>
-                  <th className="pb-2 pr-4 font-medium text-right">Antal</th>
-                  <th className="pb-2 pr-4 font-medium text-right">Median</th>
-                  <th className="pb-2 font-medium text-right">Medellön</th>
-                </tr>
-              </thead>
-              <tbody>
-                {employerList.map((e) => (
-                  <tr
-                    key={e.employer_name}
-                    className="border-b border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="py-2 pr-4">{e.employer_name}</td>
-                    <td className="py-2 pr-4 text-right text-gray-500">{e.n}</td>
-                    <td className="py-2 pr-4 text-right font-medium">
-                      {formatSalary(e.median)}
-                    </td>
-                    <td className="py-2 text-right text-gray-600">
-                      {formatSalary(e.mean_salary)}
-                    </td>
-                  </tr>
-                ))}
-
-                {/* Arbetsgivare med n<5: antal anställda, men inga lönesiffror */}
-                {smallEmployers.map((e) => (
-                  <tr
-                    key={`small-${e.employer_name}`}
-                    className="border-b border-gray-100 text-gray-400"
-                  >
-                    <td className="py-2 pr-4">{e.employer_name}</td>
-                    <td className="py-2 pr-4 text-right">{e.n}</td>
-                    <td className="py-2 text-right italic" colSpan={2}>
-                      Underlag för litet för lönestatistik
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {/* De 15 med flest anställda visas direkt; resten ligger kvar i DOM:en
+              bakom en expander (indexerbara) + klientsidefilter. */}
+          <EmployerTable
+            full={employerList.map((e) => ({
+              name: e.employer_name,
+              n: e.n,
+              median: formatSalary(e.median),
+              mean: formatSalary(e.mean_salary),
+            }))}
+            small={smallEmployers.map((e) => ({
+              name: e.employer_name,
+              n: e.n,
+            }))}
+          />
           <p className="text-xs text-gray-400 mt-2">
             Lönesiffror visas endast för arbetsgivare med minst 5 anställda i denna
             titel. Arbetsgivare med färre visas med antal anställda men utan
