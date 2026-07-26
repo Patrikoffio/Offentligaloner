@@ -327,7 +327,7 @@ export default async function RapportSida({
       </div>
 
       {/* Dokumenthuvud */}
-      <header className="flex items-end justify-between gap-4 pb-3 border-b border-black">
+      <header className="flex items-end justify-between gap-4 pb-3 border-b border-gray-900">
         <div className="flex items-center gap-2.5">
           <Logo size={28} />
           <span className="text-brand font-medium">offentligaloner.se</span>
