@@ -59,9 +59,9 @@ export default async function Home() {
               <li key={t.slug} className="border-b border-gray-100">
                 <Link
                   href={`/yrken/${t.slug}`}
-                  className="flex items-center justify-between gap-4 py-3 group"
+                  className="flex flex-col gap-0.5 py-3 group sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                 >
-                  <span className="text-brand-mid group-hover:underline font-medium">
+                  <span className="text-brand-mid group-hover:underline font-medium break-words min-w-0">
                     {t.title}
                   </span>
                   <span className="tnum text-sm text-gray-500 shrink-0">

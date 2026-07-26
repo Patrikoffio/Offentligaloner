@@ -170,10 +170,6 @@ function TitleSection({
         median={n.median}
         p75={n.p75}
         p90={n.p90}
-        employer={
-          primary ? { name: primary.employer_name, value: primary.median } : null
-        }
-        formatSalary={(v) => formatSalary(v)}
       />
 
       {/* Positionsnot */}

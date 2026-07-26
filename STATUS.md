@@ -65,6 +65,16 @@ Hetzner kvar som fallskärm, ej uppsagd.
    p10 och p90 blir nästan lika långa på mobil. Fixen är att låta
    skalan börja strax under p10 i stället för på noll. Separat från
    punkt 3, som gäller DistributionBand.tsx i rapporten.
+8. ✅ "Vanligaste yrkena"-listan på startsidan spränger mobilen < 385 px:
+   raden är flex med en shrink-0-spann ("median … · … anställda") som
+   inte krymper → horisontell scroll (65 px vid 320, 25 px vid 360).
+   INTE headern (verifierat 0). Fix: stapla på mobil (flex-col < sm),
+   radbrytning i stället för scroll. Mätt grön (scrollWidth = viewport
+   vid 320/360/390).
+9. Nyckeltalskorten på startsidan: stora talen (t.ex. "534 293",
+   tnum text-2xl i grid-cols-3) är bredare än sin cell < ~360 px och
+   tänjer sig något utanför plattan. INNESLUTET – ingen scroll
+   (scrollWidth = viewport). Ej brådskande – vänta till samlad mobilrunda.
 
 ### B — mätningar
 7. Konverteringsfunnel: yrkessida → checkout → betalning
