@@ -50,8 +50,11 @@ Hetzner kvar som fallskärm, ej uppsagd.
 2. ✅ Metodtexten säger "samtliga 10 arbetsgivare", tabellen säger 1.
    Två nämnare i samma dokument utan förklaring.
    (kolumnrubrik "Antal" → "Anställda" i rapport + yrkessida)
-3. Percentildiagrammet saknar markör för användarens egen lön.
+3. ✅ Percentildiagrammet saknar markör för användarens egen lön.
    Den finns bara som brödtext. Det är hela individualiseringen.
+   (DistributionBand: din lön = hero-markör, median = tick, kommun
+   borttagen från bandet. Klientsidan via sessionStorage; pill låst
+   till linjen även utanför spannet.)
 4. Falsk precision: vid n=19 avrunda p10/p90 till närmaste 500 kr,
    eller visa bara p25–p75.
 5. ✅ Loggan i rapportkomponenten är en tom hexagon — egen hårdkodad SVG
@@ -61,10 +64,13 @@ Hetzner kvar som fallskärm, ej uppsagd.
    (symbol-only < sm, full logga ≥ sm; header-överflöd verifierat = 0.
    OBS: kvarstående sid-överflöd < 385 px kommer från "Vanligaste
    yrkena"-listan, INTE headern — ej ännu åtgärdat, se not.)
-7. Percentilstaplarna på yrken/[slug]/page.tsx utgår från noll, så
-   p10 och p90 blir nästan lika långa på mobil. Fixen är att låta
-   skalan börja strax under p10 i stället för på noll. Separat från
-   punkt 3, som gäller DistributionBand.tsx i rapporten.
+7. ✅ Percentilstaplarna på yrken/[slug]/page.tsx utgår från noll, så
+   p10 och p90 blir nästan lika långa på mobil.
+   (LÖST ANNORLUNDA än först föreslaget: avkortad skala förkastad –
+   längdkodning från noll får inte manipuleras. Ersatte staplarna med
+   DistributionBand (showOwnSalary=false) + Medellön-textrad. Fri sida =
+   betald rapport, samma visuella språk. Mätt: 360/390 rena; 320 px
+   marginellt etikettöverlapp 4/1 px, accepterat (A).)
 8. ✅ "Vanligaste yrkena"-listan på startsidan spränger mobilen < 385 px:
    raden är flex med en shrink-0-spann ("median … · … anställda") som
    inte krymper → horisontell scroll (65 px vid 320, 25 px vid 360).
@@ -94,6 +100,12 @@ Hetzner kvar som fallskärm, ej uppsagd.
 15. Byt webhook-URL från `offentligaloner.vercel.app` till `offentligaloner.se`
 16. Postmark gratisnivå: 100 mejl/månad. Slår i taket vid ~100 sälj.
 17. `npm config set prefix ~/.npm-global` för npm-rättighetsfelet
+18. Radera /rapport/forhandsvisning (intern band-preview, noindex) INNAN
+    deploy – den ska inte till prod.
+19. 2026-uppräkningen måste återinföras i band-representationen innan
+    NEXT_PUBLIC_SHOW_PROJECTION_2026 slås på. (Per-stapel-sublinjen +
+    "Kolumner: 2024/2026"-noten föll bort när yrkessidans staplar byttes
+    mot DistributionBand, punkt 7.)
 
 ---
 

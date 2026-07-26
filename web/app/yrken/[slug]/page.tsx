@@ -13,6 +13,7 @@ import OrderReport, {
   type EmployerOption,
 } from "./OrderReport";
 import EmployerTable from "./EmployerTable";
+import DistributionBand from "@/components/DistributionBand";
 import { availablePaymentLogos } from "@/lib/paymentLogos";
 
 // ─── Typer ──────────────────────────────────────────────────────────────────
@@ -330,18 +331,6 @@ export default async function YrkeSida({
 
   const year = national?.collection_year ?? 2024;
 
-  const distribution = national
-    ? [
-        { label: "10:e percentilen", value: national.p10 },
-        { label: "25:e percentilen", value: national.p25 },
-        { label: "Median", value: national.median, highlight: true },
-        { label: "75:e percentilen", value: national.p75 },
-        { label: "90:e percentilen", value: national.p90 },
-        { label: "Medellön", value: national.mean_salary },
-      ]
-    : [];
-
-  const maxVal = national?.p90 ?? 1;
 
   // Månadsintervall för källhänvisningens aggregerade rad (punkt 2)
   const sourceCitationRange = monthRange(
@@ -504,40 +493,20 @@ export default async function YrkeSida({
               </p>
             )}
 
-          <div className="space-y-3">
-            {distribution.map(({ label, value, highlight }) => (
-              <div key={label} className="flex items-center gap-2 sm:gap-3">
-                <span
-                  className={`w-32 sm:w-44 text-sm text-right shrink-0 ${
-                    highlight ? "font-semibold" : "text-gray-600"
-                  }`}
-                >
-                  {label}
-                </span>
-                <div className="flex-1 bg-gray-100 rounded-full h-5 relative">
-                  <div
-                    className={`h-5 rounded-full ${
-                      highlight ? "bg-brand" : "bg-brand-light"
-                    }`}
-                    style={{ width: `${Math.round((value / maxVal) * 100)}%` }}
-                  />
-                </div>
-                <span
-                  className={`w-20 sm:w-28 shrink-0 text-sm ${
-                    highlight ? "font-semibold" : "text-gray-700"
-                  }`}
-                >
-                  {formatSalary(value)}
-                  {PROJECTION_ENABLED &&
-                    projectedSalary(value, title.category) != null && (
-                      <span className="block text-xs text-emerald-700">
-                        {formatSalary(projectedSalary(value, title.category))} (2026)
-                      </span>
-                    )}
-                </span>
-              </div>
-            ))}
-          </div>
+          <DistributionBand
+            p10={national.p10}
+            p25={national.p25}
+            median={national.median}
+            p75={national.p75}
+            p90={national.p90}
+            showOwnSalary={false}
+          />
+          <p className="text-sm text-gray-600 mt-2">
+            Medellön:{" "}
+            <span className="tnum font-medium text-gray-900">
+              {formatSalary(national.mean_salary)}
+            </span>
+          </p>
 
           {/* Lönespridning som eget budskap direkt under grafen – sidans
               starkaste argument. Samma X (medianSpread) som i beställningsblockets

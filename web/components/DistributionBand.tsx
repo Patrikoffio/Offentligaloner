@@ -23,6 +23,7 @@ interface Props {
   median: number;
   p75: number;
   p90: number;
+  showOwnSalary?: boolean; // false på fria yrkessidan (ingen inmatad lön)
 }
 
 const STORAGE_KEY = "offlon:egen_lon";
@@ -38,10 +39,18 @@ function edgeTransform(x: number): string {
   return x < 15 ? "translateX(0)" : x > 85 ? "translateX(-100%)" : "translateX(-50%)";
 }
 
-export default function DistributionBand({ p10, p25, median, p75, p90 }: Props) {
+export default function DistributionBand({
+  p10,
+  p25,
+  median,
+  p75,
+  p90,
+  showOwnSalary = true,
+}: Props) {
   // Egen lön – klientsidan. Läs vid mount + lyssna på custom-event (förhandsvisning).
   const [salary, setSalary] = useState<number | null>(null);
   useEffect(() => {
+    if (!showOwnSalary) return; // yrkessidan: läs aldrig sessionStorage, ingen hero
     const read = () => {
       try {
         const raw = sessionStorage.getItem(STORAGE_KEY);
@@ -54,7 +63,7 @@ export default function DistributionBand({ p10, p25, median, p75, p90 }: Props) 
     read();
     window.addEventListener("offlon:egen-lon", read);
     return () => window.removeEventListener("offlon:egen-lon", read);
-  }, []);
+  }, [showOwnSalary]);
 
   const axisMin = p10 * 0.92;
   const axisMax = p90 * 1.08;
