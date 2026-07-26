@@ -77,30 +77,50 @@ Källa: `20241027_backup_salaries.dump` (Postgres 16, custom format).
 - Commits på svenska, imperativ.
 - Inga hemligheter i repo. `/data` (rådata med persondata) är gitignorad.
 
-## Designsystem (v2-webb, from 2026-07-24)
+## Designsystem (v2-webb, v1-palett from 2026-07-26)
 
 Följ detta i all ny webb-UI. Ljust tema, dokumentkänsla (ingen dark mode – sajten
 är innehålls-/utskriftsorienterad och lönerapporten trycks i färg). Definierat i
 `web/app/globals.css` (`@theme`-tokens) – använd tokens, inte lösa hex.
 
-**Färger (Tailwind-token → hex → användning):**
-- `brand` `#0C447C` – mörkblå: ordmärke, primär knapp, rubrikaccent, band 25–75.
-- `brand-mid` `#378ADD` – länkar, kategoritext, logo-stapel.
-- `brand-light` `#85B7EB` – ljusblå: logo-stapel, staplar på yrkessidan.
-- `accent` `#F0997B` – mjuk orange: logo-cirkel, dekor.
-- `accent-strong` `#D85A30` – stark orange: nyckeltal (kommun), kommun-punkt i band.
-- `accent-dark` `#993C1D` – djup orange: kommunens siffror i rapporttabellen.
-- `plate-blue` `#F4F8FC` – ljusblå platta: nyckeltalskort (median/mål), stat-kort.
-- `plate-orange` `#FAECE7` – ljus orange platta: nyckeltalskort (kommun).
-- Band (rapport): ljusblått spann `#CFE3F6` (10–90), mörkblått `#0C447C` (25–75),
-  medianlinje `#08243F`.
+Paletten är den gamla **v1-identiteten** (teal + neutrala teal-toner, from 2026-07-26).
+Tokennamnen (`brand`/`accent`/`plate`) behölls; endast värdena bytts, och Tailwinds
+grå skala överlagras i `@theme` så neutralerna blir teal-tonade utan markup-ändring.
+Paletten är enkulörig (teal) – v1 har ingen andra kulör, så f.d. orange `accent-*`
+mappas nu till teal/mörk teal.
 
-**Logotyp** (`web/components/Logo.tsx`, geometri låst i viewBox 64 – samma i
-`app/icon.svg` favicon + `app/apple-icon.tsx` 180 px): rundad kvadrat `#0C447C`
-radius 15 (~23 %); tre stigande pill-staplar (rx = halva bredden 4.5) x=13/27.5/42,
-bredd 9, höjder 15/23/31 från baslinje y=49, färger `#378ADD`/`#85B7EB`/`#FFFFFF`;
-orange cirkel `#F0997B` cx=46.5 cy=11 r=4. Ordmärke: "Offentliga löner" i `brand`,
-weight 500, `font-sans`.
+**Palett (roll → hex → token/användning):**
+- bakgrund `#FFFFFF` – `bg-white` (oförändrad).
+- yta `#F4F7F7` – plattor/kort/ytor → `plate-blue`, `plate-orange`, `gray-50/100`.
+- linjer `#DAE3E4` – ramar/avdelare → `gray-200/300`.
+- dämpad text `#5A6A6C` – sekundär text/bildtext → `gray-400/500/600`.
+- text `#13201F` – brödtext/rubriker → `gray-700/800/900`.
+- primär `#166F81` – ordmärke, primär knapp, länkar, band 25–75, nyckeltal →
+  `brand`, `brand-mid`, `accent`, `accent-strong`.
+- länk hover `#0F5563` – mörk teal: hover, kommunsiffror i rapporttabell,
+  kommun-punkt i band → `brand-dark`, `accent-dark`.
+- `brand-light` `#96BEC6` – ljus teal: staplar på yrkessidan, band 10–90.
+- Band (rapport): ljus teal-spann `#96BEC6` (10–90), primär `#166F81` (25–75),
+  medianlinje `#13201F`, kommun-punkt/pil `#0F5563`.
+
+Kontrast: samtliga textytor klarar WCAG AA (≥4.5:1 brödtext) – dämpad `#5A6A6C`
+på vitt 5,66:1 / på yta 5,25:1; primär `#166F81` som länk på vitt 5,79:1; vit
+knapptext på primär 5,79:1. `brand-light` är endast dekorativ stapel-/bandfyllning
+(ej text) – lyder ej textkontrastkravet.
+
+**FÖRBJUDNA i gränssnittet:** de brokiga v1-logofärgerna `#1D92B4` (ljus teal),
+`#589F44` (grön), `#F0B71C` (gul). De finns ENDAST inuti logotypfilen
+`web/public/offlon-logo.svg` – rita/använd dem aldrig i UI.
+
+**Logotyp:** sidhuvudet (`SiteHeader`) använder den fulla v1-logotypen
+`web/public/offlon-logo.svg` (transparent SVG: hexagonsymbol + ordbild
+"Offentligalöner.se" med undertext i ett; aspekt ≈4,08:1, renderas `h-8`). De
+brokiga färgerna ovan lever bara här. Symbolen separat (`web/components/Logo.tsx`,
+rapportens dokumenthuvud) = v1-hexagonens **rena kontur** i primär `#166F81`,
+`viewBox 0 0 56 64`, spetsig topp/botten. Favicon `web/public/icon-hexagon.svg`
+(eget filnamn så cachad favicon ersätts; kopplad via `metadata.icons` i
+`layout.tsx`) + `app/apple-icon.tsx` (180 px, hexagon på vit yta) +
+`app/opengraph-image.tsx` (1200×630, hexagon + ordbild) = samma hexagonkontur.
 
 **Typografi:** `font-sans` = Geist (UI/brödtext), `font-serif` = Source Serif 4
 (hero-rubrik, rapportens yrkestitel 24 px, positionsnot i kursiv). Båda via

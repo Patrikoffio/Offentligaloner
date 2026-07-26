@@ -1,9 +1,9 @@
 // Spridningsband för en yrkestitel (lönerapporten).
 //
-//   ▸ ljusblått band  = 10:e–90:e percentilen (hela spannet)
-//   ▸ mörkblått band  = 25:e–75:e percentilen (var hälften ligger), tjockare
+//   ▸ ljus teal-band  = 10:e–90:e percentilen (hela spannet)
+//   ▸ primär teal-band= 25:e–75:e percentilen (var hälften ligger), tjockare
 //   ▸ mörk linje      = median
-//   ▸ orange punkt    = vald kommuns median, med vit ring + pil + etikett ovanför
+//   ▸ mörk teal-punkt = vald kommuns median, med vit ring + pil + etikett ovanför
 //   ▸ värdeetiketter  = 10:e perc./median/75:e perc./90:e perc. under bandet
 //
 // Skala: 10:e perc −8 % till 90:e perc +8 %. Ren rendering, inga schemaändringar.
@@ -90,10 +90,10 @@ export default function DistributionBand({
             width: `${p90x - p10x}%`,
             top: CENTER - 6,
             height: 12,
-            background: "#CFE3F6",
+            background: "#96BEC6",
           }}
         />
-        {/* Mörkblått band: 25:e–75:e (tjockare) */}
+        {/* Primär teal-band: 25:e–75:e (tjockare) */}
         <div
           className="absolute rounded-full"
           style={{
@@ -101,7 +101,7 @@ export default function DistributionBand({
             width: `${p75x - p25x}%`,
             top: CENTER - 11,
             height: 22,
-            background: "#0C447C",
+            background: "#166F81",
           }}
         />
         {/* Medianlinje */}
@@ -113,11 +113,11 @@ export default function DistributionBand({
             height: 32,
             width: 2,
             transform: "translateX(-1px)",
-            background: "#08243F",
+            background: "#13201F",
           }}
         />
 
-        {/* Orange kommun-punkt + etikett + pil (ovanför bandet) */}
+        {/* Kommun-punkt (mörk teal) + etikett + pil (ovanför bandet) */}
         {empx != null && employer && (
           <>
             <div
@@ -144,7 +144,7 @@ export default function DistributionBand({
                 height: 0,
                 borderLeft: "5px solid transparent",
                 borderRight: "5px solid transparent",
-                borderTop: "6px solid #D85A30",
+                borderTop: "6px solid #0F5563",
               }}
             />
             {/* Punkt med vit ring */}
@@ -157,9 +157,9 @@ export default function DistributionBand({
                 width: 15,
                 height: 15,
                 borderRadius: "9999px",
-                background: "#D85A30",
+                background: "#0F5563",
                 border: "3px solid #FFFFFF",
-                boxShadow: "0 0 0 1px rgba(217,90,48,0.45)",
+                boxShadow: "0 0 0 1px rgba(15,85,99,0.45)",
               }}
             />
           </>

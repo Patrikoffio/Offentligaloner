@@ -1,57 +1,36 @@
-// Apple-touch-icon (180×180) genererad ur samma logotypgeometri som icon.svg.
-// Byggs vid deploy via next/og (satori). Staplarna positioneras absolut, skalade
-// med faktorn 180/64 = 2.8125 från viewBox-64.
+// Apple-touch-icon (180×180) – samma källa som faviconen: v1-hexagonens kontur
+// i primär teal (#166F81) på ljus yta. Byggs vid deploy via next/og.
 import { ImageResponse } from "next/og";
 
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-export default function AppleIcon() {
-  const bar = (
-    left: number,
-    top: number,
-    height: number,
-    color: string,
-  ) => (
-    <div
-      style={{
-        position: "absolute",
-        left,
-        top,
-        width: 25.3,
-        height,
-        borderRadius: 13,
-        background: color,
-      }}
-    />
+// Hexagon-kontur som data-URI (satori renderar SVG-bilder via resvg).
+const hexagon =
+  "data:image/svg+xml," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 64">' +
+      '<polygon points="28,4 52.25,18 52.25,46 28,60 3.75,46 3.75,18" ' +
+      'fill="none" stroke="#166F81" stroke-width="6" stroke-linejoin="round"/>' +
+      "</svg>",
   );
 
+export default function AppleIcon() {
   return new ImageResponse(
     (
       <div
         style={{
           width: "100%",
           height: "100%",
-          background: "#0C447C",
+          background: "#FFFFFF",
           borderRadius: 42,
           display: "flex",
-          position: "relative",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        {bar(36.6, 95.6, 42.2, "#378ADD")}
-        {bar(77.3, 73.1, 64.7, "#85B7EB")}
-        {bar(118.1, 50.6, 87.2, "#FFFFFF")}
-        <div
-          style={{
-            position: "absolute",
-            left: 119.5,
-            top: 19.6,
-            width: 22.5,
-            height: 22.5,
-            borderRadius: 12,
-            background: "#F0997B",
-          }}
-        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={hexagon} width={104} height={119} alt="" />
       </div>
     ),
     { ...size },

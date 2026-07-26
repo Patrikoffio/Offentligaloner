@@ -187,25 +187,25 @@ function TitleSection({
           <tr className="text-left text-gray-500">
             <th
               className="pb-1.5 pr-4 font-medium"
-              style={{ borderTop: "1.5px solid #111827" }}
+              style={{ borderTop: "1.5px solid #13201F" }}
             >
               Arbetsgivare
             </th>
             <th
               className="pb-1.5 pr-4 font-medium text-right"
-              style={{ borderTop: "1.5px solid #111827" }}
+              style={{ borderTop: "1.5px solid #13201F" }}
             >
               Antal
             </th>
             <th
               className="pb-1.5 pr-4 font-medium text-right"
-              style={{ borderTop: "1.5px solid #111827" }}
+              style={{ borderTop: "1.5px solid #13201F" }}
             >
               Median
             </th>
             <th
               className="pb-1.5 font-medium text-right"
-              style={{ borderTop: "1.5px solid #111827" }}
+              style={{ borderTop: "1.5px solid #13201F" }}
             >
               Medellön
             </th>
@@ -213,12 +213,12 @@ function TitleSection({
         </thead>
         <tbody>
           {t.employers.map((e) => (
-            <tr key={e.employer_name} style={{ borderBottom: "0.5px solid #D1D5DB" }}>
+            <tr key={e.employer_name} style={{ borderBottom: "0.5px solid #DAE3E4" }}>
               <td className="py-1.5 pr-4 pt-2.5">{e.employer_name}</td>
               <td className="tnum py-1.5 pr-4 text-right text-gray-500">{e.n}</td>
               <td
                 className="tnum py-1.5 pr-4 text-right font-medium"
-                style={{ color: "#993C1D" }}
+                style={{ color: "#0F5563" }}
               >
                 {formatSalary(e.median)}
               </td>
@@ -230,7 +230,7 @@ function TitleSection({
           {/* Referensrad: hela landet */}
           <tr
             className="italic text-gray-500"
-            style={{ borderBottom: "1.5px solid #111827" }}
+            style={{ borderBottom: "1.5px solid #13201F" }}
           >
             <td className="py-1.5 pr-4">Hela landet, referens</td>
             <td className="tnum py-1.5 pr-4 text-right">

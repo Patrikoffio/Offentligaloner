@@ -28,6 +28,11 @@ export const metadata: Metadata = {
   title: { default: "Offentliga löner", template: "%s | Offentliga löner" },
   description:
     "Lönestatistik för svensk offentlig sektor, insamlad via offentlighetsprincipen.",
+  // Ny favicon (v1-hexagon, primär teal) – eget filnamn så cachad favicon ersätts.
+  // apple-icon och opengraph-image genereras via app/-konventionsrutter.
+  icons: {
+    icon: [{ url: "/icon-hexagon.svg", type: "image/svg+xml" }],
+  },
   openGraph: {
     type: "website",
     siteName: "Offentliga löner",

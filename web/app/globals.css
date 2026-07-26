@@ -1,33 +1,54 @@
 @import "tailwindcss";
 
 /*
-  Designsystem – Offentliga löner
-  ───────────────────────────────
-  Färger härledda ur logotypen. Dokumentkänsla, ljust tema (ingen dark mode:
-  sajten är innehålls-/utskriftsorienterad och lönerapporten trycks i färg).
+  Designsystem – Offentliga löner (v1-palett)
+  ───────────────────────────────────────────
+  Teal + neutrala teal-toner ur den gamla v1-identiteten. Dokumentkänsla, ljust
+  tema (ingen dark mode: sajten är innehålls-/utskriftsorienterad, rapporten
+  trycks i färg). Brokiga v1-logofärger (#1D92B4/#589F44/#F0B71C) används ALDRIG
+  i gränssnittet – de finns bara inuti logotypfilen.
 
-    brand         #0C447C  mörkblå – ordmärke, rubrikaccenter, primär knapp
-    brand-mid     #378ADD  mellanblå – logo-stapel, länkar
-    brand-light   #85B7EB  ljusblå – logo-stapel, band
-    accent        #F0997B  mjuk orange – logo-cirkel, dekor
-    accent-strong #D85A30  stark orange – nyckeltal, kommun-punkt
-    accent-dark   #993C1D  djup orange – kommunens siffror i tabell
-    plate-blue    #F4F8FC  ljusblå platta – nyckeltalskort (median)
-    plate-orange  #FAECE7  ljus orange platta – nyckeltalskort (kommun)
+    bakgrund      #FFFFFF  (bg-white, oförändrad)
+    yta           #F4F7F7  plattor/kort/ytor       → plate-blue/plate-orange, gray-50/100
+    linjer        #DAE3E4  ramar/avdelare          → gray-200/300
+    dämpad text   #5A6A6C  sekundär text/bildtext  → gray-400/500/600
+    text          #13201F  brödtext/rubriker       → gray-700/800/900
+    primär        #166F81  ordmärke, knappar, länkar, band, nyckeltal
+    länk hover    #0F5563  mörk teal – hover, kommunsiffror i tabell
+
+  Tokennamnen (brand/accent/plate) behålls; endast värdena bytts. accent-*
+  (tidigare orange) mappas nu till teal – v1-paletten har ingen andra kulör.
 
   Typografi: Geist (sans, UI/brödtext) + Source Serif 4 (serif, rubriker i
-  hero/rapport, positionsnot i kursiv).
+  hero/rapport, positionsnot i kursiv). Oförändrad.
 */
 
 @theme {
-  --color-brand: #0c447c;
-  --color-brand-mid: #378add;
-  --color-brand-light: #85b7eb;
-  --color-accent: #f0997b;
-  --color-accent-strong: #d85a30;
-  --color-accent-dark: #993c1d;
-  --color-plate-blue: #f4f8fc;
-  --color-plate-orange: #faece7;
+  /* Brand → primär teal (+ mörk teal för hover). */
+  --color-brand: #166f81;
+  --color-brand-dark: #0f5563;
+  --color-brand-mid: #166f81;
+  --color-brand-light: #96bec6;
+  /* accent-* (f.d. orange) → teal; ingen andra kulör i v1-paletten. */
+  --color-accent: #166f81;
+  --color-accent-strong: #166f81;
+  --color-accent-dark: #0f5563;
+  /* Plattor → yta. */
+  --color-plate-blue: #f4f7f7;
+  --color-plate-orange: #f4f7f7;
+
+  /* Neutraler → v1 (yta/linjer/dämpad/text). Överlagrar Tailwinds grå skala så
+     ramar, ytor och text får de teal-tonade neutralerna utan markup-ändring. */
+  --color-gray-50: #f4f7f7;
+  --color-gray-100: #f4f7f7;
+  --color-gray-200: #dae3e4;
+  --color-gray-300: #dae3e4;
+  --color-gray-400: #5a6a6c;
+  --color-gray-500: #5a6a6c;
+  --color-gray-600: #5a6a6c;
+  --color-gray-700: #13201f;
+  --color-gray-800: #13201f;
+  --color-gray-900: #13201f;
 
   --font-sans: var(--font-geist), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
