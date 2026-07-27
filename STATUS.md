@@ -47,6 +47,15 @@ Hetzner kvar som fallskärm, ej uppsagd.
   (id 3 i purchases = 39 kr; övriga rader 99 kr), så antal sälj × pris ≠
   faktisk omsättning. Stäm av mot Stripe innan omsättningssiffror används.
 
+## Synonymhopslagning
+- Bevisat: 5 opublicerbara ANDT/drog-titlar summerar till n=13 och passerar
+  n>=5 vid hopslagning. Preventionssamordnare 4, Drogsamordnare 3, Alkohol- och
+  Drogsamordnare 2, ANDT-Samordnare 2, Drog- och Brottsförebyggande Samordnare 2.
+- Tröskelsänkning till n>=3 ger max ~657 titlar och fördelningen domineras av
+  n=1. Svag hävstång, avfärdad.
+- Synonymhopslagning kräver kurerat mappningsbeslut. Substrängsökning ger falska
+  träffar (t.ex. "andt" fångar Tandtekniker).
+
 ---
 
 ## Arbetslista

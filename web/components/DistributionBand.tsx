@@ -15,7 +15,8 @@
 // markören dyker upp efter hydrering (och i utskrift, sidan är laddad då).
 // Custom-eventet "offlon:egen-lon" låter förhandsvisningen uppdatera live.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 
 interface Props {
   p10: number;
@@ -78,17 +79,107 @@ export default function DistributionBand({
   const p90x = pos(p90);
   const userX = salary != null ? pos(salary) : null;
 
+  // Kollisionsdetektering för de nedre etiketterna. Vid tät fördelning (t.ex.
+  // Lantmäteriingenjör: median och p75 2,4 % isär) överlappar texterna på mobil.
+  // Regel: krockar två etiketter döljs den mindre viktiga. Prioritet (behålls
+  // först): median > p10/p90 > p75. Mätning sker klientsidan mot faktisk
+  // containerbredd + faktiska etikettbredder, så tröskeln följer viewporten.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const labelEls = useRef<Map<string, HTMLDivElement | null>>(new Map());
+  const [hiddenLabels, setHiddenLabels] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    // sync=true tvingar synkron commit (flushSync) så DOM hinner uppdateras
+    // INNAN webbläsaren serialiserar utskriften – annars fångar ⌘P den gamla
+    // (skärmberäknade) etikettuppsättningen.
+    const compute = (sync = false) => {
+      const cw = containerRef.current?.clientWidth ?? 0;
+      if (!cw) return;
+      // Högre priority = viktigare, behålls vid krock.
+      const specs = [
+        { key: "median", x: medx, priority: 3 },
+        { key: "p10", x: p10x, priority: 2 },
+        { key: "p90", x: p90x, priority: 2 },
+        { key: "p75", x: p75x, priority: 1 },
+      ];
+      // Etikettens px-span, med samma kantankring som edgeTransform.
+      const spanOf = (key: string, x: number): readonly [number, number] => {
+        const w = labelEls.current.get(key)?.offsetWidth ?? 0;
+        const cx = (x / 100) * cw;
+        if (x < 15) return [cx, cx + w];
+        if (x > 85) return [cx - w, cx];
+        return [cx - w / 2, cx + w / 2];
+      };
+      const GAP = 4; // px marginal innan två etiketter räknas som krock
+      const kept: (readonly [number, number])[] = [];
+      const next = new Set<string>();
+      for (const s of [...specs].sort((a, b) => b.priority - a.priority)) {
+        const [l, r] = spanOf(s.key, s.x);
+        const collides = kept.some(([kl, kr]) => l < kr + GAP && r > kl - GAP);
+        if (collides) next.add(s.key);
+        else kept.push([l, r]);
+      }
+      const apply = () =>
+        setHiddenLabels((prev) =>
+          prev.size === next.size && [...prev].every((k) => next.has(k))
+            ? prev
+            : next,
+        );
+      if (sync) {
+        try {
+          flushSync(apply);
+        } catch {
+          apply();
+        }
+      } else {
+        apply();
+      }
+    };
+
+    const onResize = () => compute(false);
+    const onPrint = () => compute(true);
+    compute(false);
+
+    // Skärmändringar avfyrar resize. Utskrift ändrar layoutbredden (A4 ≈ 688 px
+    // innehåll) UTAN resize-event, så mät om vid print och återställ efteråt.
+    window.addEventListener("resize", onResize);
+    window.addEventListener("beforeprint", onPrint);
+    window.addEventListener("afterprint", onResize);
+    const mq = window.matchMedia("print");
+    const onMq = (e: MediaQueryListEvent) => compute(e.matches);
+    mq.addEventListener?.("change", onMq);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("beforeprint", onPrint);
+      window.removeEventListener("afterprint", onResize);
+      mq.removeEventListener?.("change", onMq);
+    };
+  }, [p10x, medx, p75x, p90x]);
+
   const bottomLabel = (
+    labelKey: string,
     x: number,
     value: number,
     caption: string,
     strong = false,
   ) => {
     const align = x < 12 ? "left" : x > 88 ? "right" : "center";
+    const isHidden = hiddenLabels.has(labelKey);
     return (
       <div
-        key={caption}
-        style={{ position: "absolute", left: `${x}%`, top: CENTER + 20, transform: edgeTransform(x) }}
+        key={labelKey}
+        ref={(el) => {
+          labelEls.current.set(labelKey, el);
+        }}
+        aria-hidden={isHidden || undefined}
+        style={{
+          position: "absolute",
+          left: `${x}%`,
+          top: CENTER + 20,
+          transform: edgeTransform(x),
+          visibility: isHidden ? "hidden" : "visible",
+        }}
         className="whitespace-nowrap"
       >
         <div
@@ -111,7 +202,7 @@ export default function DistributionBand({
 
   return (
     <figure className="my-5">
-      <div className="relative w-full" style={{ height: HEIGHT }}>
+      <div ref={containerRef} className="relative w-full" style={{ height: HEIGHT }}>
         {/* Ljus teal-band: 10:e–90:e */}
         <div
           className="absolute rounded-full"
@@ -210,11 +301,11 @@ export default function DistributionBand({
           </>
         )}
 
-        {/* Nedre värdeetiketter */}
-        {bottomLabel(p10x, p10, "10:e perc.")}
-        {bottomLabel(medx, median, "median", true)}
-        {bottomLabel(p75x, p75, "75:e perc.")}
-        {bottomLabel(p90x, p90, "90:e perc.")}
+        {/* Nedre värdeetiketter (kollisionsmedvetna – se hiddenLabels ovan) */}
+        {bottomLabel("p10", p10x, p10, "10:e perc.")}
+        {bottomLabel("median", medx, median, "median", true)}
+        {bottomLabel("p75", p75x, p75, "75:e perc.")}
+        {bottomLabel("p90", p90x, p90, "90:e perc.")}
       </div>
 
       <figcaption className="text-xs text-gray-500 mt-1">
