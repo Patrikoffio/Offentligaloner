@@ -31,14 +31,21 @@ Hetzner kvar som fallskärm, ej uppsagd.
 - Trasig kvittokedja → hela kedjan fungerar, funktionen finns inte.
 
 ## Ej mätt — det här är luckorna
-- **Konverteringsgrad.** Ingen siffra finns. 36 221 klick/12 mån mot
-  99 kr-produkt. Utan denna siffra går ingen prioritering att göra.
+- **Konverteringsgrad.** MÄTT: 537 sälj / 36 221 klick ≈ **1,5 %** (12 mån).
+  (Lokal Django-dump: 550 betalda all-time, 147 senaste 12 mån; extremt platt
+  long tail – 147 köp fördelade på 129 distinkta primäryrken, max 4 per yrke.
+  Trafik är hävstången, inte enskilda sidor.)
 - **5xx-triagen.** 590 URL:er, ej körd. Skript: `pipeline/triage_5xx.py`
   (stdlib, kräver ingen pip). Indata: Search Console → Indexering →
   Sidor → "Serverfel (5xx)" → Exportera.
   Hypotes: historiska. Fel började 23 juli 17:37 UTC, dagen före DNS-bytet.
 - **Tröskeln över alla 2 151 AID-titlar.** Endast Ekolog stickprovad.
 - **CTR.** ~2 M visningar, 1,8 % CTR. Desktop 1,0 % är onormalt lågt.
+
+## Öppna frågor
+- **Omsättning behöver Stripe-verifieras.** Priset har varit 39 kr någon gång
+  (id 3 i purchases = 39 kr; övriga rader 99 kr), så antal sälj × pris ≠
+  faktisk omsättning. Stäm av mot Stripe innan omsättningssiffror används.
 
 ---
 
@@ -83,7 +90,8 @@ Hetzner kvar som fallskärm, ej uppsagd.
    (scrollWidth = viewport). Ej brådskande – vänta till samlad mobilrunda.
 
 ### B — mätningar
-7. Konverteringsfunnel: yrkessida → checkout → betalning
+7. ✅ Konverteringsfunnel: yrkessida → checkout → betalning.
+   Mätt ≈ 1,5 % (537 sälj / 36 221 klick, 12 mån) – se Konverteringsgrad ovan.
 8. Tröskelfördelning över alla titlar, korsad mot topp-200 sökfrågor
 9. 5xx-triagen
 
