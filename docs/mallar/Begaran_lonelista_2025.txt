@@ -26,6 +26,13 @@ Uppgifterna begärs ut för publicering i databasen Offentliga löner
 (offentligaloner.se), som innehar utgivningsbevis utfärdat av Mediemyndigheten
 (nr 2024-077) och därmed omfattas av yttrandefrihetsgrundlagens skydd.
 
+Om ni redan har lämnat uppgifter till SKR:s lönestatistik eller till SCB:s
+lönestrukturstatistik (för kommuner och regioner samlar SKR in underlaget åt SCB –
+det är alltså samma årliga inrapportering) tar vi gärna emot en kopia av den filen
+i stället. Den är redan sammanställd och AID-klassificerad, vilket brukar innebära
+mindre arbete för er än en ny export. Personnummer och namn behövs inte och kan
+maskeras.
+
 Jag önskar ta del av informationen digitalt i Excelformat eller motsvarande
 maskinläsbart format. Om det finns politiskt beslutad taxa för utlämnande av
 digitala handlingar önskar jag ta del av beslutet innan handlingarna skickas.
