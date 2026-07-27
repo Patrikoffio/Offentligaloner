@@ -28,11 +28,10 @@ export const metadata: Metadata = {
   title: { default: "Offentliga löner", template: "%s | Offentliga löner" },
   description:
     "Lönestatistik för svensk offentlig sektor, insamlad via offentlighetsprincipen.",
-  // Ny favicon (v1-hexagon, primär teal) – eget filnamn så cachad favicon ersätts.
-  // apple-icon och opengraph-image genereras via app/-konventionsrutter.
-  icons: {
-    icon: [{ url: "/icon-hexagon.svg", type: "image/svg+xml" }],
-  },
+  // Favicon via app/-filkonventioner: app/favicon.ico (kvadratisk → /favicon.ico
+  // 200, slutar 404:a) + app/icon.png (192×192, flerfärgade v1-hexagonen ur
+  // offlon-symbol.svg). INGEN metadata.icons här – ett explicit icons-fält skulle
+  // åsidosätta fil-konventionerna. apple-icon + opengraph-image genereras via app/.
   openGraph: {
     type: "website",
     siteName: "Offentliga löner",

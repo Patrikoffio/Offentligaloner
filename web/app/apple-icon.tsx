@@ -1,17 +1,21 @@
-// Apple-touch-icon (180×180) – samma källa som faviconen: v1-hexagonens kontur
-// i primär teal (#166F81) på ljus yta. Byggs vid deploy via next/og.
+// Apple-touch-icon (180×180) – SAMMA flerfärgade v1-hexagon som favicon.ico +
+// app/icon.png (härledd ur public/offlon-symbol.svg), centrerad på vit rundad
+// yta. Byggs vid deploy via next/og. Inline fill-attribut (inte style=) så resvg
+// rasteriserar färgerna korrekt.
 import { ImageResponse } from "next/og";
 
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-// Hexagon-kontur som data-URI (satori renderar SVG-bilder via resvg).
-const hexagon =
+const symbol =
   "data:image/svg+xml," +
   encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 64">' +
-      '<polygon points="28,4 52.25,18 52.25,46 28,60 3.75,46 3.75,18" ' +
-      'fill="none" stroke="#166F81" stroke-width="6" stroke-linejoin="round"/>' +
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.010009765625 479.760009765625 554">' +
+      '<polygon points="214.06 291.87 214.06 470.66 162.42 440.85 162.42 321.67 214.06 291.87" fill="#589F44"/>' +
+      '<polygon points="110.79 411.05 110.79 351.49 59.26 381.24 110.79 411.05" fill="#F0B71C"/>' +
+      '<polygon points="317.27 232.27 317.27 440.85 265.64 470.66 265.64 262.08 317.27 232.27" fill="#1D92B4"/>' +
+      '<polygon points="239.86 68.37 188.22 98.17 368.88 202.47 368.88 411.06 420.5 381.26 420.5 172.67 239.86 68.37" fill="#166F81"/>' +
+      '<path d="M1000,1277,760.12,1138.5v-277L1000,723,1239.88,861.5v277ZM775.49,1129.62,1000,1259.24l224.51-129.62V870.38L1000,740.76,775.49,870.38Z" transform="translate(-760.12 -723.01)" fill="#166F81"/>' +
       "</svg>",
   );
 
@@ -30,7 +34,7 @@ export default function AppleIcon() {
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={hexagon} width={104} height={119} alt="" />
+        <img src={symbol} width={130} height={150} alt="" />
       </div>
     ),
     { ...size },

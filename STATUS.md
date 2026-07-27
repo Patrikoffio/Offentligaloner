@@ -52,6 +52,7 @@ Hetzner kvar som fallskärm, ej uppsagd.
 ## Arbetslista
 
 ### A — produktfel i det kunden betalar för
+> **Deploy 27 juli 2026:** punkt 1, 2, 3, 5, 6, 7 + A.8 (avsnitt A). Kvar i A: punkt 4.
 1. ✅ `"1:a högsta medianlönen av 1 arbetsgivare"` — villkora bort när
    antal arbetsgivare = 1
 2. ✅ Metodtexten säger "samtliga 10 arbetsgivare", tabellen säger 1.
@@ -108,8 +109,9 @@ Hetzner kvar som fallskärm, ej uppsagd.
 15. Byt webhook-URL från `offentligaloner.vercel.app` till `offentligaloner.se`
 16. Postmark gratisnivå: 100 mejl/månad. Slår i taket vid ~100 sälj.
 17. `npm config set prefix ~/.npm-global` för npm-rättighetsfelet
-18. Radera /rapport/forhandsvisning (intern band-preview, noindex) INNAN
-    deploy – den ska inte till prod.
+18. ✅ Radera /rapport/forhandsvisning (intern band-preview, noindex).
+    Borttagen ur koden i commit 1a913ee (före 27-juli-deployen) och
+    verifierat borta ur prod: offentligaloner.se/rapport/forhandsvisning → 404.
 19. 2026-uppräkningen måste återinföras i band-representationen innan
     NEXT_PUBLIC_SHOW_PROJECTION_2026 slås på. (Per-stapel-sublinjen +
     "Kolumner: 2024/2026"-noten föll bort när yrkessidans staplar byttes
