@@ -26,3 +26,6 @@ snapshots/*.json
 # OS/editor
 .DS_Store
 Thumbs.db
+
+# GSC-exporter (Search Console, kan innehålla känsliga trafikdata)
+data/gsc_*.csv
