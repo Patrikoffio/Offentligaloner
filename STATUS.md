@@ -1,4 +1,4 @@
-# offentligaloner.se — läge 26 juli 2026
+# offentligaloner.se — läge 27 juli 2026
 
 ## Stack
 Next.js 16 på Vercel · Supabase · Stripe Checkout · Postmark
@@ -22,6 +22,27 @@ Hetzner kvar som fallskärm, ej uppsagd.
 | Kvittomejl | Levererat 16:35:33 | Postmark Activity, "Delivered" |
 | Kvittot som saknades | Aldrig byggt | Enda mejlet är leveransbekräftelse, inget kvitto |
 | Tröskelns effekt | Bekräftad | Ekolog: 10 arbetsgivare lämnade uppgifter, 1 klarade n≥5 |
+
+## Verifierat 27 juli — GSC + arbetsgivaranalys (fynd, ej förslag)
+
+Full rapport med alla tabeller: `docs/analys/gsc_arbetsgivare_2026-07-27.md`.
+(GSC-källa: `data/gsc_sidor_16mn.csv`, 16 mån 2025-03-26→2026-07-25.)
+
+- **Kommuntäckning viktad mot storlek: 45,6 %** (befolkning 2024) mot **51 %
+  oviktat** (149/290). Urvalet skevar mot **små** kommuner. Största orsaken:
+  **Stockholm (995 574 inv.) saknas** — står som "avvakta" i 2024-loggen. Täckt
+  kommunbefolkning 4 826 169 av rikets 10 587 710.
+- **Arbetsgivartyper i datan: 149 kommuner, 7 regioner. Noll kommunalförbund,
+  noll kommunala bolag, noll statliga myndigheter.** (441 671 kommunindivider +
+  92 622 regionindivider.) De tre nolltyperna är expansionsspår, ej insamlade.
+- **Datalösa (info-)sidor bär ca 40 % av organiska klick** och har **HÖGRE CTR än
+  datasidorna: 3,72 % mot 3,32 %** (info rankar på nischade long-tail-frågor).
+  **Total noindex på hela mängden är AVFÄRDAT** — för dyrt (~18 000–22 000
+  klick/år, golv 13 600). Kvarvarande fråga: sidor utan data **OCH** utan klick
+  kan noindexas — men det kräver en **query-nivå-export** för att identifieras.
+- **GSC-exporten är cappad till 1000 rader (999 sidor) = 46 050 av 66 674 klick
+  (69 %). Svansen ~20 624 klick är omätt** — den dominerande osäkerheten i
+  noindex-estimatet.
 
 ## Avfärdade hypoteser
 - Dubbelindexering www/icke-www → gamla URL-prefix-egendomar i Search
