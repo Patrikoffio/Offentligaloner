@@ -101,6 +101,19 @@ export default function OmTjansten() {
               användarna – ansvarar för och bestämmer över innehållet, och att
               publiceringen omfattas av grundlagsskydd.
             </p>
+            <p className="text-sm text-gray-500">
+              Enskild näringsidkare · Organisationsnummer 890405-4676 ·
+              Momsreg.nr SE890405467601 · Godkänd för F-skatt
+            </p>
+            <p className="text-sm text-gray-500">
+              Frågor om metod, källor eller rättelser:{" "}
+              <a
+                href="mailto:redaktionen@offentligaloner.se"
+                className="text-brand-mid hover:underline"
+              >
+                redaktionen@offentligaloner.se
+              </a>
+            </p>
           </div>
         </div>
       </Section>

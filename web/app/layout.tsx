@@ -73,8 +73,11 @@ export default function RootLayout({
                 <strong>Patrik Larsson</strong>
               </p>
               <p>
-                Organisationsnummer: 19890405-4676 · Postadress: Tunnerbohult
-                Marieslätt, 333 92 Broaryd
+                Enskild näringsidkare · Organisationsnummer: 890405-4676 ·
+                Momsreg.nr SE890405467601 · Godkänd för F-skatt
+              </p>
+              <p>
+                Postadress: Tunnerbohult Marieslätt, 333 92 Broaryd
               </p>
               <p>
                 Utgivningsbevis nr 2024-077, giltigt t.o.m. 2034-10-28

@@ -48,7 +48,7 @@ export default function Integritetspolicy() {
           <strong>Patrik Larsson</strong>.
         </p>
         <ul className="list-disc pl-5 space-y-1">
-          <li>Organisationsnummer: 19890405-4676</li>
+          <li>Organisationsnummer: 890405-4676</li>
           <li>Postadress: Tunnerbohult Marieslätt, 333 92 Broaryd</li>
           <li>
             E-post:{" "}

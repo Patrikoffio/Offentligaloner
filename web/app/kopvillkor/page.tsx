@@ -47,10 +47,12 @@ export default function Kopvillkor() {
       <Section title="Vem du handlar av">
         <p>
           Tjänsten tillhandahålls av <strong>Patrik Larsson</strong> (enskild
-          firma).
+          näringsidkare).
         </p>
         <ul className="list-disc pl-5 space-y-1">
-          <li>Organisationsnummer: 19890405-4676</li>
+          <li>Organisationsnummer: 890405-4676</li>
+          <li>Momsreg.nr SE890405467601</li>
+          <li>Godkänd för F-skatt</li>
           <li>Postadress: Tunnerbohult Marieslätt, 333 92 Broaryd</li>
           <li>
             E-post:{" "}
