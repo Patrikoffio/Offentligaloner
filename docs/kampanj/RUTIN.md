@@ -50,7 +50,10 @@ Varje mottagen fil får **en rad** i `docs/kampanj/leveranslogg.csv`
 | `diarienummer` | Vid begäran enligt offentlighetsprincipen; tomt för öppen data |
 | `filnamn` | Det normaliserade namnet på disk (se §2) |
 | `format` | `xlsx` / `csv` / `pdf` … |
-| `avser_period` | ÅÅÅÅ-MM som filen avser |
+| `avser_period` | ÅÅÅÅ-MM som filen avser (tom om filen saknar periodkolumn; flera perioder `;`-separeras) |
+| `lonebegrepp` | Vad lönekolumnen är: `grundlön` / `inkl tillägg`. Ange källa (definitionstext i filen, eller härlett) |
+| `sysselsattningsgrad` | `ja` / `nej` – finns kolumn för sysselsättningsgrad |
+| `timavlonade` | `ja` / `nej` – ingår timavlönade i filen |
 | `granskad` | `ja` / `nej` – rimlighetsgranskad (radantal, medellön, sentineler) |
 | `importerad` | `ja` / `nej` – inläst i v2 via parser |
 | `anteckning` | Källa, taxa, avslag, e-legitimationskrav, avvikelser m.m. |
