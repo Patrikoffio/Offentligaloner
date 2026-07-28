@@ -56,10 +56,12 @@ Full rapport med alla tabeller: `docs/analys/gsc_arbetsgivare_2026-07-27.md`.
   (Lokal Django-dump: 550 betalda all-time, 147 senaste 12 mån; extremt platt
   long tail – 147 köp fördelade på 129 distinkta primäryrken, max 4 per yrke.
   Trafik är hävstången, inte enskilda sidor.)
-- **5xx-triagen.** 590 URL:er, ej körd. Skript: `pipeline/triage_5xx.py`
-  (stdlib, kräver ingen pip). Indata: Search Console → Indexering →
-  Sidor → "Serverfel (5xx)" → Exportera.
-  Hypotes: historiska. Fel började 23 juli 17:37 UTC, dagen före DNS-bytet.
+- **5xx-triagen — STÄNGD.** 589 URL:er (ej 590). **`pipeline/triage_5xx.py`
+  finns inte och ska inte byggas.** Frågan är avförd: v2-rutten ger **404, inte
+  5xx** för okänd slug (`notFound()`), alla testade URL:er svarar **200**, och
+  ingen genomsökning har skett sedan **7 april 2026** (5xx:erna är historiska
+  Django-fel från före migreringen 24 juli). Kvarvarande åtgärd:
+  **"Validera korrigering"** i Search Console.
 - **Tröskeln över alla 2 151 AID-titlar.** Endast Ekolog stickprovad.
 - **CTR.** ~2 M visningar, 1,8 % CTR. Desktop 1,0 % är onormalt lågt.
 
