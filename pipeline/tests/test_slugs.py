@@ -127,5 +127,59 @@ class ResolveSlugPrefersExisting(unittest.TestCase):
         )
 
 
+class EmployerSlugMatchesSlugifyNew(unittest.TestCase):
+    """Driftvakt mellan de två kopiorna av regel 2.
+
+    `migrate_dump._employer_slug` (fallback i den verifierade migreringen) och
+    `slugs.slugify_new` (kanonisk modul för 2026-importen) kodar SAMMA regel.
+    De måste ge identiskt resultat för varje titel. migrate_dump.py är verifierad
+    och RÖRS INTE – det här testet fångar bara en framtida drift dem emellan
+    direkt, så de inte tyst glider isär och ger olika slug för nya titlar.
+
+    migrate_dump importeras lat: dess toppnivå kräver psycopg2 men har inga
+    sidoeffekter (allt arbete ligger bakom `if __name__ == "__main__"`). Saknas
+    psycopg2 i miljön hoppas testet över i stället för att fela på importen.
+    """
+
+    def _employer_slug(self):
+        sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
+        try:
+            import migrate_dump  # noqa: PLC0415 – lat import, se docstring
+        except Exception as exc:  # psycopg2 saknas e.d.
+            self.skipTest(f"kan inte importera migrate_dump: {exc!r}")
+        return migrate_dump._employer_slug
+
+    def test_identical_over_all_fixture_titles(self) -> None:
+        employer_slug = self._employer_slug()
+        titles = sorted({t for t, _ in _load_pairs()})
+        diffs = [
+            (t, employer_slug(t), slugify_new(t))
+            for t in titles
+            if employer_slug(t) != slugify_new(t)
+        ]
+        self.assertEqual(
+            diffs,
+            [],
+            f"{len(diffs)} titlar ger OLIKA slug ur _employer_slug vs slugify_new "
+            f"(reglerna har glidit isär). Exempel: {diffs[:10]}",
+        )
+
+    def test_identical_over_edge_cases(self) -> None:
+        employer_slug = self._employer_slug()
+        for title in [
+            "  Ledande  ",
+            "É- Övrigt/Test",
+            "///",
+            "Å Ä Ö",
+            "Foo (Bar)/Baz",
+            "Lärare (Trä-/Metallslöjd) - Obehörig/Outbildad",
+        ]:
+            self.assertEqual(
+                employer_slug(title),
+                slugify_new(title),
+                f"drift på kantfall {title!r}",
+            )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
