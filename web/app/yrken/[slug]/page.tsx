@@ -356,7 +356,7 @@ export default async function YrkeSida({
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
       {/* Brödsmula */}
-      <nav className="text-sm text-gray-500 mb-4">
+      <nav className="text-sm text-gray-500 mb-4 break-words hyphens-auto">
         <a href="/" className="hover:underline">Startsida</a>
         {" › "}
         {title.category && (
@@ -369,7 +369,7 @@ export default async function YrkeSida({
       </nav>
 
       {/* Rubrik */}
-      <h1 className="text-3xl font-bold tracking-tight mb-1">{title.title}</h1>
+      <h1 className="text-3xl font-bold tracking-tight mb-1 break-words hyphens-auto">{title.title}</h1>
       {title.category && (
         <p className="text-sm text-brand-mid mb-4">{title.category}</p>
       )}
