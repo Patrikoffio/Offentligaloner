@@ -1,67 +1,66 @@
-Ämne: Begäran om allmän handling - lönelista 2026
+Ämne: Begäran om allmän handling – lönelista 2026
 
-Hej,
+Hej!
 
-Med stöd av tryckfrihetsförordningens regler om handlingsoffentlighet
-begär jag att få ta del av löneuppgifter för samtliga anställda hos
-[ORGANISATION].
+Med stöd av offentlighetsprincipen (2 kap. tryckfrihetsförordningen) begär jag
+att få ta del av en lönelista över samtliga anställda, innehållande följande
+uppgifter per anställd:
 
-I FÖRSTA HAND begär jag den sammanställning som lämnas till Sveriges
-Kommuner och Regioner för den årliga lönestatistiken per november
-("Novemberstatistiken"), eller motsvarande underlag. Den innehåller
-normalt redan de uppgifter jag efterfrågar.
-
-Kan denna inte lämnas ut begär jag i stället ett utdrag ur lönesystemet
-med följande fält, en rad per individ:
-
-- Befattning samt AID-kod och AID-etikett
-- Månadslön samt eventuella fasta lönetillägg
-- Lönetyp (månadslön eller timlön)
-- SYSSELSÄTTNINGSGRAD
-- Anställningsform
+- Titel/Befattning
+- AID-etikett och AID-kod (SKR:s Arbetsidentifikation kommuner och regioner)
+- Sysselsättningsgrad (t.ex. 100 %, 80 %)
+- Lön (månadslön för månadsavlönade, timlön för timavlönade)
+- Eventuella lönetillägg
+- Avlöningsform (månadslön eller timlön)
+- Anställningstyp (tillsvidare, vikariat, timanställd)
+- Anställningstid i organisationen
 - Kön
-- Födelseår (de fyra första siffrorna i personnumret räcker)
-- Förvaltning, division och enhet
-- Arbetsställenummer (CFAR-nummer) om det finns
+- Ålder eller födelseår (de fyra första siffrorna i personnumret räcker)
+- Förvaltning
+- Placering/Tjänsteställe
 
-Namn och fullständigt personnummer efterfrågas inte.
+Uppgifterna begärs ut för publicering i databasen Offentliga löner
+(offentligaloner.se), som innehar utgivningsbevis utfärdat av Mediemyndigheten
+(nr 2024-077) och därmed omfattas av yttrandefrihetsgrundlagens skydd.
+Publicering sker uteslutande i aggregerad form.
 
-SYSSELSÄTTNINGSGRAD är den viktigaste posten. Utan uppgiften kan lönerna
-inte räknas om till heltid, och materialet går då inte att jämföra med
-andra arbetsgivare. Om endast ett fält kan lämnas ut är det detta jag i
-första hand behöver.
+Om ni redan har lämnat uppgifter till SKR:s lönestatistik per november
+("Novemberstatistiken") eller till SCB:s lönestrukturstatistik – för kommuner
+och regioner samlar SKR in underlaget åt SCB, det är alltså samma årliga
+inrapportering – tar vi gärna emot en kopia av den filen i stället. Den är
+redan sammanställd och AID-klassificerad, vilket brukar innebära mindre arbete
+för er än en ny export. Personnummer och namn behövs inte och kan maskeras.
 
-FORMAT
-Uppgifterna önskas som fil (Excel eller CSV) via e-post. Begäran avser
-alltså inte en utskrift, och en fil har inget sidantal.
+Sysselsättningsgrad är den viktigaste posten. Utan den kan lönerna inte räknas
+om till heltid, och materialet går då inte att jämföra med andra arbetsgivare.
+Om endast ett fält kan lämnas ut är det detta jag i första hand behöver.
 
-AVGIFT
-Om ni avser att ta ut avgift ber jag om besked om grunden och den
-ungefärliga storleken innan materialet framställs. Jag ber samtidigt om
-hänvisning till det beslut av fullmäktige som fastställt taxa för
-utlämnande i ELEKTRONISK form. JO har i beslut dnr 1149-2015 uttalat att
-en taxa som avser papperskopior inte utan vidare kan tillämpas på
-elektroniskt utlämnande, och att ett särskilt beslut krävs.
+Jag önskar ta del av informationen digitalt i Excelformat eller motsvarande
+maskinläsbart format. Begäran avser alltså inte en utskrift, och en fil har
+inget sidantal.
 
-AVSLAG
-Avser ni att inte lämna ut något av de begärda fälten ber jag om ett
-skriftligt, motiverat och överklagbart beslut med besvärshänvisning
-enligt 6 kap. 3 § offentlighets- och sekretesslagen.
+Om ni avser att ta ut avgift ber jag om besked om grunden och den ungefärliga
+storleken innan materialet framställs. Jag ber samtidigt om hänvisning till det
+beslut av fullmäktige som fastställt taxa för utlämnande i elektronisk form.
+JO har i beslut dnr 1149-2015 uttalat att en taxa som avser papperskopior inte
+utan vidare kan tillämpas på elektroniskt utlämnande, utan att ett särskilt
+beslut krävs.
 
-[ENDAST TILL STORA REGIONER:]
-Om lönelistorna förvaltas av flera myndigheter eller bolag inom
-organisationen tar jag tacksamt emot en förteckning över dessa med
-respektive registratorsadress.
+Omfattas någon uppgift av sekretess önskar jag ta del av motivering och ett
+skriftligt, överklagbart beslut med besvärshänvisning enligt 6 kap. 3 §
+offentlighets- och sekretesslagen.
 
-För eventuell fakturering lämnar jag gärna namn, adress och
-organisationsnummer.
+Blir filerna för stora att mejla kan de skickas via t.ex. Sprend eller
+WeTransfer, alternativt kontakta mig så hittar vi en lösning.
 
-Offentligalöner.se har utgivningsbevis från Mediemyndigheten och
-publicerar lönestatistik för offentlig sektor i aggregerad form.
+[ENDAST TILL STORA REGIONER – tas bort annars:]
+Om lönelistorna förvaltas av flera myndigheter eller bolag inom organisationen
+tar vi tacksamt emot en förteckning över dessa med respektive
+registratorsadress.
 
-Hör gärna av er om något behöver förtydligas.
+Tack på förhand!
 
-Med vänlig hälsning
+Bästa hälsningar
 
 Patrik Larsson
 Ansvarig utgivare, Offentligalöner.se
