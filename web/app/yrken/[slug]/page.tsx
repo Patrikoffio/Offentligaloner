@@ -14,12 +14,14 @@ import OrderReport, {
 } from "./OrderReport";
 import EmployerTable from "./EmployerTable";
 import DistributionBand from "@/components/DistributionBand";
+import { coverageNote } from "@/lib/copy";
 import { availablePaymentLogos } from "@/lib/paymentLogos";
 
 // ─── Typer ──────────────────────────────────────────────────────────────────
 
 interface NationalStats {
   n: number;
+  n_raw: number;
   mean_salary: number;
   p10: number;
   p25: number;
@@ -199,7 +201,7 @@ export default async function YrkeSida({
   // Hämta nationell statistik (kan saknas — titlar utan n>=5 data får informationssida)
   const { data: national } = await supabaseAdmin
     .from("title_national_stats")
-    .select("n, mean_salary, p10, p25, median, p75, p90, collection_year")
+    .select("n, n_raw, mean_salary, p10, p25, median, p75, p90, collection_year")
     .eq("generalized_title_id", title.id)
     .single<NationalStats>();
 
@@ -506,6 +508,11 @@ export default async function YrkeSida({
             <span className="tnum font-medium text-gray-900">
               {formatSalary(national.mean_salary)}
             </span>
+          </p>
+          {/* Täckningsredovisning – hur stor del av de utlämnade månadslönerna
+              medianen vilar på. Visas alltid, även vid full täckning. */}
+          <p className="text-xs text-gray-500 mt-1">
+            {coverageNote(national.n, national.n_raw)}
           </p>
 
           {/* Lönespridning som eget budskap direkt under grafen – sidans

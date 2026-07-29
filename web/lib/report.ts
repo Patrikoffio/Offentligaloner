@@ -4,6 +4,7 @@ import { supabaseAdmin } from "./supabase";
 
 export interface ReportNational {
   n: number;
+  n_raw: number;
   mean_salary: number;
   p10: number;
   p25: number;
@@ -72,7 +73,7 @@ export async function buildReport(
 
   const { data: nationals } = await supabaseAdmin
     .from("title_national_stats")
-    .select("generalized_title_id, n, mean_salary, p10, p25, median, p75, p90, collection_year")
+    .select("generalized_title_id, n, n_raw, mean_salary, p10, p25, median, p75, p90, collection_year")
     .in("generalized_title_id", ids);
   const nationalById = new Map((nationals ?? []).map((r) => [r.generalized_title_id, r]));
 

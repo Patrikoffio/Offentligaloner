@@ -9,7 +9,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { supabaseAdmin } from "@/lib/supabase";
 import { buildReport, type ReportTitle } from "@/lib/report";
-import { METHOD_NOTE } from "@/lib/copy";
+import { METHOD_NOTE, coverageNote } from "@/lib/copy";
 import Logo from "@/components/Logo"; // enda logokällan (inline, symbol + ordbild)
 import DistributionBand from "@/components/DistributionBand";
 import IndividualPlacement from "./IndividualPlacement";
@@ -171,6 +171,11 @@ function TitleSection({
         p75={n.p75}
         p90={n.p90}
       />
+
+      {/* Täckningsredovisning – samma rad som på yrkessidan (lib/copy.ts) */}
+      <p className="text-xs text-gray-500 text-center mt-2">
+        {coverageNote(n.n, n.n_raw)}
+      </p>
 
       {/* Positionsnot */}
       <p className="font-serif italic text-gray-600 text-center max-w-[460px] mx-auto my-6">
