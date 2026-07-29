@@ -1,0 +1,70 @@
+Ämne: Begäran om allmän handling - lönelista 2026
+
+Hej,
+
+Med stöd av tryckfrihetsförordningens regler om handlingsoffentlighet
+begär jag att få ta del av löneuppgifter för samtliga anställda hos
+[ORGANISATION].
+
+I FÖRSTA HAND begär jag den sammanställning som lämnas till Sveriges
+Kommuner och Regioner för den årliga lönestatistiken per november
+("Novemberstatistiken"), eller motsvarande underlag. Den innehåller
+normalt redan de uppgifter jag efterfrågar.
+
+Kan denna inte lämnas ut begär jag i stället ett utdrag ur lönesystemet
+med följande fält, en rad per individ:
+
+- Befattning samt AID-kod och AID-etikett
+- Månadslön samt eventuella fasta lönetillägg
+- Lönetyp (månadslön eller timlön)
+- SYSSELSÄTTNINGSGRAD
+- Anställningsform
+- Kön
+- Födelseår (de fyra första siffrorna i personnumret räcker)
+- Förvaltning, division och enhet
+- Arbetsställenummer (CFAR-nummer) om det finns
+
+Namn och fullständigt personnummer efterfrågas inte.
+
+SYSSELSÄTTNINGSGRAD är den viktigaste posten. Utan uppgiften kan lönerna
+inte räknas om till heltid, och materialet går då inte att jämföra med
+andra arbetsgivare. Om endast ett fält kan lämnas ut är det detta jag i
+första hand behöver.
+
+FORMAT
+Uppgifterna önskas som fil (Excel eller CSV) via e-post. Begäran avser
+alltså inte en utskrift, och en fil har inget sidantal.
+
+AVGIFT
+Om ni avser att ta ut avgift ber jag om besked om grunden och den
+ungefärliga storleken innan materialet framställs. Jag ber samtidigt om
+hänvisning till det beslut av fullmäktige som fastställt taxa för
+utlämnande i ELEKTRONISK form. JO har i beslut dnr 1149-2015 uttalat att
+en taxa som avser papperskopior inte utan vidare kan tillämpas på
+elektroniskt utlämnande, och att ett särskilt beslut krävs.
+
+AVSLAG
+Avser ni att inte lämna ut något av de begärda fälten ber jag om ett
+skriftligt, motiverat och överklagbart beslut med besvärshänvisning
+enligt 6 kap. 3 § offentlighets- och sekretesslagen.
+
+[ENDAST TILL STORA REGIONER:]
+Om lönelistorna förvaltas av flera myndigheter eller bolag inom
+organisationen tar jag tacksamt emot en förteckning över dessa med
+respektive registratorsadress.
+
+För eventuell fakturering lämnar jag gärna namn, adress och
+organisationsnummer.
+
+Offentligalöner.se har utgivningsbevis från Mediemyndigheten och
+publicerar lönestatistik för offentlig sektor i aggregerad form.
+
+Hör gärna av er om något behöver förtydligas.
+
+Med vänlig hälsning
+
+Patrik Larsson
+Ansvarig utgivare, Offentligalöner.se
+Utgivningsbevis nr 2024-077, Mediemyndigheten
+Tunnerbohult Marieslätt, 333 92 Broaryd
+patrik@offentligaloner.se · 073-042 33 35
