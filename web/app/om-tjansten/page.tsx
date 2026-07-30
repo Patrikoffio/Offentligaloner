@@ -55,8 +55,8 @@ export default function OmTjansten() {
           Offentligalöner finns för att jämna ut den skillnaden. Vi har begärt ut
           lönelistor från 156 kommuner och regioner och sammanställt dem till en
           enhetlig databas: 534 293 löneuppgifter från 2024 års insamling,
-          omräknade till heltidsekvivalent lön så att deltid inte snedvrider
-          jämförelsen. För 2 151 yrkestitlar finns tillräckligt underlag för att
+          angivna som överenskommen månadslön vid heltid så att deltid inte
+          snedvrider jämförelsen. För 2 151 yrkestitlar finns tillräckligt underlag för att
           redovisa statistik som går att luta sig mot. För yrken där underlaget är
           för litet för att redovisa löner utan att enskilda personer kan
           identifieras visar vi i stället vad vi vet om yrket och var det
@@ -124,7 +124,7 @@ export default function OmTjansten() {
           från arbetsgivarna – 156 kommuner och regioner lämnade ut sina
           lönelistor för 2024 års insamling. Uppgifterna kommer in i vitt skilda
           format och sammanställs hos oss till en enhetlig databas, där lönerna
-          räknas om till heltidsekvivalent nivå och yrkestitlar grupperas så att
+          avser överenskommen månadslön vid heltid och yrkestitlar grupperas så att
           samma yrke blir jämförbart mellan arbetsgivare. Varje publicerad siffra
           är kopplad till sitt utlämningsdatum och sin källa.
         </p>

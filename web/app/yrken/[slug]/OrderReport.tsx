@@ -239,8 +239,8 @@ export default function OrderReport({
         </ul>
         <p className="text-[11px] leading-relaxed text-gray-400 mt-3">
           Bygger på faktiska löner utlämnade enligt offentlighetsprincipen, endast
-          där minst 5 anställda har samma roll. 2024 års insamling, omräknat till
-          heltidsekvivalent månadslön. Kan skrivas ut eller sparas som PDF; länken
+          där minst 5 anställda har samma roll. 2024 års insamling, överenskommen
+          månadslön vid heltid. Kan skrivas ut eller sparas som PDF; länken
           är giltig i tre månader.
         </p>
       </div>

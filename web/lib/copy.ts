@@ -3,8 +3,8 @@
 // "Vår integritetsprincip" på /om-tjansten (enligt beställning DEL D).
 export const METHOD_NOTE: string[] = [
   "Uppgifterna är inhämtade via offentlighetsprincipen från kommuner och " +
-    "regioner och avser 2024 års löner. Lönerna är omräknade till " +
-    "heltidsekvivalent månadslön. Statistik visas endast när minst 5 individer " +
+    "regioner och avser 2024 års löner. Lönerna avser överenskommen månadslön " +
+    "vid heltid. Statistik visas endast när minst 5 individer " +
     "har samma titel hos samma arbetsgivare respektive nationellt – " +
     "individuella löner publiceras aldrig.",
   "Median = mittenvärdet. Percentiler anger spridningen: 10:e percentilen är " +
@@ -12,12 +12,10 @@ export const METHOD_NOTE: string[] = [
 ];
 
 // Täckningsrad – IDENTISK på yrkessidan och i lönerapporten.
-// n_ft = poster med känd heltidslön (beräkningsunderlaget), n_raw = poster med
-// månadslön satt (allt utlämnat). Visas alltid; vid full täckning kortas den.
-export function coverageNote(nFt: number, nRaw: number): string {
+// n = antal månadsavlönade i beräkningen; n_hourly = timavlönade som INTE ingår
+// (de saknar jämförbar månadslön). Andra meningen utelämnas när n_hourly = 0.
+export function coverageNote(n: number, nHourly: number): string {
   const fmt = (v: number) => v.toLocaleString("sv-SE");
-  if (nFt >= nRaw) {
-    return `Beräknat på samtliga ${fmt(nFt)} anställda.`;
-  }
-  return `Beräknat på ${fmt(nFt)} av ${fmt(nRaw)} anställda med uppgift om sysselsättningsgrad.`;
+  const base = `Beräknat på ${fmt(n)} månadsavlönade anställda.`;
+  return nHourly > 0 ? `${base} ${fmt(nHourly)} timavlönade ingår inte.` : base;
 }

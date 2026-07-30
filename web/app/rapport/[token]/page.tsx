@@ -128,7 +128,7 @@ function TitleSection({
         {t.title}
       </h2>
       <p className="text-sm text-gray-500 mt-1 mb-5">
-        {kommunLabel} · 2024 års löner · heltidsekvivalent månadslön
+        {kommunLabel} · 2024 års löner · överenskommen månadslön vid heltid
       </p>
 
       {/* Tre nyckeltalskort */}
@@ -174,7 +174,7 @@ function TitleSection({
 
       {/* Täckningsredovisning – samma rad som på yrkessidan (lib/copy.ts) */}
       <p className="text-xs text-gray-500 text-center mt-2">
-        {coverageNote(n.n, n.n_raw)}
+        {coverageNote(n.n, n.n_hourly)}
       </p>
 
       {/* Positionsnot */}

@@ -21,7 +21,7 @@ import { availablePaymentLogos } from "@/lib/paymentLogos";
 
 interface NationalStats {
   n: number;
-  n_raw: number;
+  n_hourly: number;
   mean_salary: number;
   p10: number;
   p25: number;
@@ -201,7 +201,7 @@ export default async function YrkeSida({
   // Hämta nationell statistik (kan saknas — titlar utan n>=5 data får informationssida)
   const { data: national } = await supabaseAdmin
     .from("title_national_stats")
-    .select("n, n_raw, mean_salary, p10, p25, median, p75, p90, collection_year")
+    .select("n, n_hourly, mean_salary, p10, p25, median, p75, p90, collection_year")
     .eq("generalized_title_id", title.id)
     .single<NationalStats>();
 
@@ -418,7 +418,7 @@ export default async function YrkeSida({
                   {categoryStats.median_median.toLocaleString("sv-SE")} kr/mån
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Medianen av alla titlars medianer i kategorin. Heltidsekvivalent.
+                  Medianen av alla titlars medianer i kategorin. Överenskommen månadslön vid heltid.
                 </p>
               </div>
             </section>
@@ -476,7 +476,7 @@ export default async function YrkeSida({
             Löner {year} — {national.n.toLocaleString("sv-SE")} anställda
           </h2>
           <p className="text-sm text-gray-500 mb-2">
-            Omräknat till heltidslön. Källa:{" "}
+            Överenskommen månadslön vid heltid. Källa:{" "}
             {national.n.toLocaleString("sv-SE")} individer hos{" "}
             {sourceList.length} arbetsgivare.
           </p>
@@ -512,7 +512,7 @@ export default async function YrkeSida({
           {/* Täckningsredovisning – hur stor del av de utlämnade månadslönerna
               medianen vilar på. Visas alltid, även vid full täckning. */}
           <p className="text-xs text-gray-500 mt-1">
-            {coverageNote(national.n, national.n_raw)}
+            {coverageNote(national.n, national.n_hourly)}
           </p>
 
           {/* Lönespridning som eget budskap direkt under grafen – sidans
