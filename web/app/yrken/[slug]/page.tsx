@@ -561,8 +561,10 @@ export default async function YrkeSida({
         </>
       )}
 
-      {/* Per arbetsgivare */}
-      {(employerList.length > 0 || smallEmployers.length > 0) && (
+      {/* Per arbetsgivare – dölj helt när ingen arbetsgivare når n>=5 (ingen
+          median att visa). Då återstår bara n<5-rader utan lönevärden, vilket
+          inte tillför något. Berör 595 titlar. */}
+      {employerList.length > 0 && (
         <section className="mb-10">
           <h2 className="text-xl font-semibold mb-4">Per arbetsgivare</h2>
           {/* De 15 med flest anställda visas direkt; resten ligger kvar i DOM:en
