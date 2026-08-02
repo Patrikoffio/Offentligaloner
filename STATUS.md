@@ -12,6 +12,33 @@ Hetzner kvar som fallskärm, ej uppsagd.
 
 ---
 
+## Läge 31 juli 2026 — lönebegrepp / migration 0011 (deploy pågår)
+
+Bakgrund: `monthly_salary` är överenskommen heltidslön i samtliga 156
+utlämnanden (verifierat titelkontrollerat mot 141 arbetsgivare). Den gamla
+uppräkningen `monthly/employment_rate` dubbelräknade deltidare. 0011 tar bort
+uppräkningen (`monthly_salary_fulltime = monthly_salary`), inför `salary_concept`
+(`agreed_fulltime` | `paid_out`) och byter `n_raw` mot `n_hourly` i statistiken.
+
+- **0011 committad (ej pushad)**, transaktionsomsluten (`BEGIN … COMMIT`),
+  verifierad genom **ren körning 0001–0011 på tom scratch-databas** (11/11 gröna).
+- **Molnet står på 0010.** Verifierat: `title_national_stats` saknar `n_hourly`,
+  `salary_records` saknar `salary_concept`. Kvällens körning **rullades tillbaka
+  av transaktionen — inga skador.**
+- **Snapshot FÖRE tagen mot molnet: 2 151 titlar.**
+- **Kvar (i ordning):** kör 0011 i tom buffert i SQL Editor → snapshot EFTER →
+  `git push` → verifiera Undersköterska (200), Psykologassistent (ny sida),
+  rapportlänk (metodraden).
+- **OBS – migrationshistorik:** supabase CLI saknas, migrationer körs manuellt i
+  SQL Editor → `supabase_migrations.schema_migrations` uppdateras **inte**. Måste
+  hanteras innan någon kör `db push` (annars vill push:en köra om 0010/0011).
+- `n_raw` är **död** efter deploy (behållen för produktionsdeployens byggfönster),
+  tas bort i **0012**.
+- **Öppet (datakvalitet):** 86 felflaggade rader (>200k-skäl ogiltigt efter 0011,
+  `monthly_salary` nu inom intervall); 1 rad utan vare sig månads- eller timlön.
+
+---
+
 ## Verifierat 26 juli — med bevis
 
 | Fråga | Svar | Bevis |
