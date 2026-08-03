@@ -1,4 +1,35 @@
-# offentligaloner.se — läge 27 juli 2026
+## 2026-08-03
+
+GJORT (deployat till main):
+- Migration 0010 + 0011 körda i molnet. 2378 titlar oförändrat.
+- Sidtitlar + meta-descriptions med lönesiffror på alla yrkessidor.
+  157 titlar >60 tecken – medvetet val, Google kapar från höger
+  och kroken (yrke + lön + median) överlever.
+- Momsspecifikation på kvittomejlet. Ny modul web/lib/moms.ts.
+  Stripe-priset bekräftat satt till 99 kr INKL moms.
+- Lönestatistik före ai_description på yrkessidor (59 % mobil).
+  Informationssidor utan data behåller beskrivning direkt under H1.
+- Arbetsgivartabell dold när ingen arbetsgivare når n>=5 (595 sidor).
+- Konverteringsevents i Vercel Analytics.
+
+MÄTPUNKT (GSC, 28 dgr per 2026-08-02):
+1 167 klick, 152 118 exponeringar, CTR 0,77 %, snittposition 24.
+Följ upp CTR omkring 2026-08-17. Mål > 1,5 %.
+
+NÄSTA:
+1. Sitemap-filter 5821 → 2378 (branchen sitemap-fix, ej gjort än)
+2. Kurerad noindex – ~3040 klicklösa varianter. De 403
+   klickbärande behålls (AVFÄRDAT-beslutet står fast).
+3. pipeline/health_check.py
+
+ÖPPET:
+- tns.n ger 858 för controller, sajten visade 817. Ombyggd nu –
+  kontrollera vilket tal som visas efter deploy.
+- n_hourly finns i DB men hämtas inte av snapshot_archives.py
+  (SQL rad 54 saknar kolumnen).
+- Regionerna levererar OLIKA heltidskonventioner. Kräver
+  salary_is_fte per källa. Dalarna: redan heltid. Uppsala:
+  KRONTALSLOENHELT = heltid. Kronoberg: fråga ställd.# offentligaloner.se — läge 27 juli 2026
 
 ## Stack
 Next.js 16 på Vercel · Supabase · Stripe Checkout · Postmark
