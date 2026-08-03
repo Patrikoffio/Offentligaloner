@@ -105,17 +105,58 @@ export async function generateMetadata({
   const { slug } = await params;
   const { data } = await supabaseAdmin
     .from("generalized_titles")
-    .select("title, ai_description, seo_keywords")
+    .select("id, title, ai_description, seo_keywords")
     .eq("slug", slug)
     .single();
 
   if (!data) return { title: "Yrke" };
 
+  // Kanonisk URL per yrke (utan www; metadataBase gör den absolut).
+  const canonicalPath = `/yrken/${slug}`;
+
+  // Nationell statistik (kan saknas → informationssida utan siffror).
+  const { data: national } = await supabaseAdmin
+    .from("title_national_stats")
+    .select("n, median, p10, p90, collection_year")
+    .eq("generalized_title_id", data.id)
+    .maybeSingle();
+
+  if (national) {
+    // Antal arbetsgivare = SAMMA tal som sidan renderar (sourceList.length =
+    // rader i title_employer_all för titeln). collection_year ur datan.
+    const { count } = await supabaseAdmin
+      .from("title_employer_all")
+      .select("*", { count: "exact", head: true })
+      .eq("generalized_title_id", data.id);
+    const employers = count ?? 0;
+
+    // Samma avrundning/format som formatSalary och DistributionBand (sv-SE).
+    const kr = (n: number) => Math.round(n).toLocaleString("sv-SE");
+
+    // Titel < 60 tecken: släpp varumärkesdelen när yrkesnamnet är långt.
+    const core = `${data.title} lön ${national.collection_year} – median ${kr(national.median)} kr`;
+    const withBrand = `${core} | Offentligalöner`;
+    const title = withBrand.length <= 60 ? withBrand : core;
+
+    const description =
+      `Median ${kr(national.median)} kr/mån för ${data.title} i kommuner och ` +
+      `regioner. ${national.n.toLocaleString("sv-SE")} faktiska löner från ${employers} ` +
+      `arbetsgivare, utlämnade enligt offentlighetsprincipen. ` +
+      `Spridning ${kr(national.p10)}–${kr(national.p90)} kr.`;
+
+    return {
+      title: { absolute: title }, // absolute = kringgå layoutens "%s | …"-mall
+      description,
+      keywords: data.seo_keywords ?? undefined,
+      alternates: { canonical: canonicalPath },
+      openGraph: { url: canonicalPath, title, description },
+    };
+  }
+
+  // Utan statistik: behåll nuvarande (ingen årsangivelse i titeln).
   const description =
     descriptionPlain(data.ai_description) ||
     `Lönestatistik för ${data.title} i kommuner och regioner i Sverige.`;
-  // Kanonisk URL per yrke (utan www; metadataBase gör den absolut).
-  const canonicalPath = `/yrken/${slug}`;
 
   return {
     title: `Lön – ${data.title}`,
