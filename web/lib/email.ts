@@ -2,6 +2,7 @@
 // Samma Postmark-konto som gamla sajten; avsändare no-reply@offentligaloner.se.
 // POSTMARK_SERVER_TOKEN får aldrig NEXT_PUBLIC-prefix.
 import { reportUrl, siteUrl } from "./site";
+import { momsspec } from "./moms";
 
 const POSTMARK_URL = "https://api.postmarkapp.com/email";
 
@@ -66,11 +67,13 @@ export async function sendReportEmail(opts: {
   expiresAt: Date;
   orderRef: string;
   purchaseDate: Date;
+  amountSek: number; // bruttopris inkl. moms – momsspecen räknas fram från detta
 }): Promise<SendResult> {
   const url = reportUrl(opts.token);
   const expiry = formatDate(opts.expiresAt);
   const purchased = formatDate(opts.purchaseDate);
   const kopvillkorUrl = `${siteUrl()}/kopvillkor`;
+  const m = momsspec(opts.amountSek);
 
   const htmlBody = `
     <div style="font-family:Arial,Helvetica,sans-serif;color:#111;line-height:1.5">
@@ -101,7 +104,9 @@ export async function sendReportEmail(opts: {
         <tr><td style="padding:2px 14px 2px 0;color:#777">Köpdatum</td><td>${purchased}</td></tr>
         <tr><td style="padding:2px 14px 2px 0;color:#777">Orderreferens</td><td style="word-break:break-all">${opts.orderRef}</td></tr>
         <tr><td style="padding:2px 14px 2px 0;color:#777">Produkt</td><td>Lönerapport (digital), levererad direkt</td></tr>
-        <tr><td style="padding:2px 14px 2px 0;color:#777">Pris</td><td>99 kr inkl. moms</td></tr>
+        <tr><td style="padding:2px 14px 2px 0;color:#777">Pris exkl. moms</td><td>${m.exklMoms} kr</td></tr>
+        <tr><td style="padding:2px 14px 2px 0;color:#777">Moms ${m.satsProcent} %</td><td>${m.moms} kr</td></tr>
+        <tr><td style="padding:2px 14px 2px 0;color:#777">Att betala</td><td><strong>${m.brutto} kr</strong></td></tr>
       </table>
       <p style="font-size:13px;color:#555;margin-top:12px">
         Du har samtyckt till att rapporten levereras omedelbart och bekräftat att
@@ -114,6 +119,11 @@ export async function sendReportEmail(opts: {
         inom 30 dagar från köpet så får du pengarna tillbaka.
       </p>
       <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+      <p style="font-size:12px;color:#888;margin:0 0 8px">
+        Patrik Larsson, enskild näringsidkare<br>
+        Organisationsnummer 890405-4676<br>
+        Momsreg.nr SE890405467601 · Godkänd för F-skatt
+      </p>
       <p style="font-size:12px;color:#888">
         Offentliga löner, offentligaloner.se · Utgivningsbevis nr 2024-077.
         Rapporten bygger på aggregerad lönestatistik (minst 5 individer per uppgift);
@@ -136,7 +146,9 @@ export async function sendReportEmail(opts: {
     `Köpdatum: ${purchased}`,
     `Orderreferens: ${opts.orderRef}`,
     "Produkt: Lönerapport (digital), levererad direkt",
-    "Pris: 99 kr inkl. moms",
+    `Pris exkl. moms: ${m.exklMoms} kr`,
+    `Moms ${m.satsProcent} %: ${m.moms} kr`,
+    `Att betala: ${m.brutto} kr`,
     "",
     "Du har samtyckt till att rapporten levereras omedelbart och bekräftat att " +
       "ångerrätten därmed går förlorad när tjänsten fullgjorts. Köpet omfattas av " +
@@ -144,6 +156,10 @@ export async function sendReportEmail(opts: {
     "",
     "Vi lämnar ändå 30 dagars nöjd-kund-garanti: är du inte nöjd, mejla " +
       "kontakt@offentligaloner.se inom 30 dagar från köpet så får du pengarna tillbaka.",
+    "",
+    "Patrik Larsson, enskild näringsidkare",
+    "Organisationsnummer 890405-4676",
+    "Momsreg.nr SE890405467601 · Godkänd för F-skatt",
     "",
     "Offentliga löner, offentligaloner.se · Utgivningsbevis nr 2024-077.",
   ].join("\n");

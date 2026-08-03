@@ -57,6 +57,10 @@ async function fulfill(session: Stripe.Checkout.Session): Promise<void> {
   const employers = employersFromSession(session);
   const token = crypto.randomBytes(32).toString("hex"); // 64 hex = 256 bit
   const expires = expiryFromNow();
+  // Belopp till kvittots momsspec: Stripes faktiska totalbelopp (öre → kr) om det
+  // finns i payloaden, annars priskonstanten. Rör inte betal-/leveranslogiken.
+  const amountSek =
+    session.amount_total != null ? session.amount_total / 100 : RAPPORT_PRIS_SEK;
 
   if (!email) {
     console.error(`[stripe-webhook] fulfill utan e-post, session ${session.id}`);
@@ -94,6 +98,7 @@ async function fulfill(session: Stripe.Checkout.Session): Promise<void> {
       inserted[0].expires_at,
       session.id,
       new Date(),
+      amountSek,
     );
     return;
   }
@@ -148,6 +153,7 @@ async function fulfill(session: Stripe.Checkout.Session): Promise<void> {
       upgraded[0].expires_at,
       session.id,
       new Date(),
+      amountSek,
     );
   }
 }
@@ -190,6 +196,7 @@ async function deliverEmail(
   expiresAt: string | null,
   orderRef: string,
   purchaseDate: Date,
+  amountSek: number,
 ): Promise<void> {
   if (!email || !token || !expiresAt) return;
   const res = await sendReportEmail({
@@ -198,6 +205,7 @@ async function deliverEmail(
     expiresAt: new Date(expiresAt),
     orderRef,
     purchaseDate,
+    amountSek,
   });
   if (!res.ok) {
     console.error(`[stripe-webhook] Postmark-fel:`, res.error);
