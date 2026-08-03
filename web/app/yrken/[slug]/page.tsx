@@ -396,6 +396,18 @@ export default async function YrkeSida({
         Math.min(...spreadQualified.map((e) => e.median))
       : null;
 
+  // Yrkesbeskrivningen (ai_description). Renderas EN gång: på informationssidor
+  // direkt under rubriken, på datasidor UNDER lönestatistiken så att lönesiffrorna
+  // syns först (särskilt på mobil). Endast omordning – innehållet oförändrat.
+  const aiDescription =
+    descriptionParagraphs(title.ai_description).length > 0 ? (
+      <div className="text-gray-600 mb-8 max-w-2xl space-y-3">
+        {descriptionParagraphs(title.ai_description).map((para, i) => (
+          <p key={i}>{para}</p>
+        ))}
+      </div>
+    ) : null;
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
       {/* Brödsmula */}
@@ -416,13 +428,9 @@ export default async function YrkeSida({
       {title.category && (
         <p className="text-sm text-brand-mid mb-4">{title.category}</p>
       )}
-      {descriptionParagraphs(title.ai_description).length > 0 && (
-        <div className="text-gray-600 mb-8 max-w-2xl space-y-3">
-          {descriptionParagraphs(title.ai_description).map((para, i) => (
-            <p key={i}>{para}</p>
-          ))}
-        </div>
-      )}
+      {/* Yrkesbeskrivning: på informationssidor direkt under rubriken. På
+          datasidor flyttad till EFTER lönestatistiken (se nedan). */}
+      {!national && aiDescription}
 
       {/* ── Informationssida (ingen publicerbar data) ────────────────────── */}
       {!national && (
@@ -588,6 +596,9 @@ export default async function YrkeSida({
             )}
         </section>
       )}
+
+      {/* Yrkesbeskrivning – på datasidor UNDER lönestatistiken (mobil: siffror först) */}
+      {national && aiDescription}
 
       {/* Beställ lönerapport – endast på sidor med publicerbar statistik */}
       {national && (
