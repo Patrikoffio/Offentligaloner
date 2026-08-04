@@ -29,3 +29,4 @@ Thumbs.db
 
 # GSC-exporter (Search Console, kan innehålla känsliga trafikdata)
 data/gsc_*.csv
+.env.health
