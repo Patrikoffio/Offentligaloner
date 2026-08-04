@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { supabaseAdmin } from "@/lib/supabase";
-import Link from "next/link";
 import HomeTop from "./HomeTop";
-import { availablePaymentLogos } from "@/lib/paymentLogos";
 
 // Kanonisk URL för startsidan (metadataBase gör den absolut: https://
 // offentligaloner.se/). Titel/beskrivning ärvs från layout.
@@ -11,14 +9,11 @@ export const metadata: Metadata = {
   openGraph: { url: "/" },
 };
 
-function formatSalary(n: number | null): string {
-  if (n == null) return "–";
-  return Math.round(n).toLocaleString("sv-SE") + " kr";
-}
-
 export default async function Home() {
-  // Nyckeltal ur datan (live) + vanligaste yrkena.
-  const [salaries, employers, titles, topRes] = await Promise.all([
+  // Nyckeltal ur datan (live) + två topplistor. "Högst lön" kräver n>=100 så
+  // den inte fylls av småyrken med tunt underlag. Samma n>=100-underlag används
+  // även för "flest anställda" (topptitlarna har stora n).
+  const [salaries, employers, titles, highNRes] = await Promise.all([
     supabaseAdmin
       .from("salary_records")
       .select("*", { count: "exact", head: true }),
@@ -30,55 +25,24 @@ export default async function Home() {
     supabaseAdmin
       .from("title_national_stats")
       .select("n, median, generalized_titles(title, slug)")
-      .gte("n", 5)
+      .gte("n", 100)
       .order("n", { ascending: false })
-      .limit(12),
+      .limit(1000),
   ]);
 
-  const topTitles = topRes.data ?? [];
+  const highN = (highNRes.data ?? []).filter((r: any) => r.generalized_titles);
+  const mostCommon = [...highN].sort((a: any, b: any) => b.n - a.n).slice(0, 5);
+  const highestPay = [...highN]
+    .sort((a: any, b: any) => b.median - a.median)
+    .slice(0, 5);
 
   return (
-    <div>
-      <HomeTop
-        count_salaries={salaries.count ?? 534293}
-        count_employers={employers.count ?? 156}
-        count_titles={titles.count ?? 2151}
-        paymentLogos={availablePaymentLogos()}
-      />
-
-      {/* Vanligaste yrkena */}
-      <section className="max-w-3xl mx-auto px-4 pb-16">
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">
-          Vanligaste yrkena
-        </h2>
-        <ul>
-          {topTitles.map((row: any) => {
-            const t = row.generalized_titles;
-            if (!t) return null;
-            return (
-              <li key={t.slug} className="border-b border-gray-100">
-                <Link
-                  href={`/yrken/${t.slug}`}
-                  className="flex flex-col gap-0.5 py-3 group sm:flex-row sm:items-center sm:justify-between sm:gap-4"
-                >
-                  <span className="text-brand-mid group-hover:underline font-medium break-words min-w-0">
-                    {t.title}
-                  </span>
-                  <span className="tnum text-sm text-gray-500 shrink-0">
-                    median {formatSalary(row.median)} ·{" "}
-                    {row.n.toLocaleString("sv-SE")} anställda
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-        <p className="mt-4 text-sm">
-          <Link href="/#sok" className="text-brand-mid hover:underline">
-            Sök bland alla yrkestitlar →
-          </Link>
-        </p>
-      </section>
-    </div>
+    <HomeTop
+      count_salaries={salaries.count ?? 534293}
+      count_employers={employers.count ?? 156}
+      count_titles={titles.count ?? 2378}
+      mostCommon={mostCommon}
+      highestPay={highestPay}
+    />
   );
 }

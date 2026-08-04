@@ -2,40 +2,28 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { PaymentTrust, type PaymentLogo } from "@/components/PaymentTrust";
+import Link from "next/link";
 
 interface TitleHit {
   slug: string;
   title: string;
 }
 
-const STEPS = [
-  { n: 1, title: "Sök ditt yrke", body: (titles: string) => `bland ${titles} yrkestitlar med lönestatistik.` },
-  {
-    n: 2,
-    title: "Välj upp till 5 yrken och 5 kommuner",
-    body: () => "jämför det som är relevant för just dig.",
-  },
-  {
-    n: 3,
-    title: "Få din lönerapport på mejlen – 99 kr",
-    body: () => "betala med Klarna eller kort.",
-  },
-];
-
-// Startsidans övre del (hero + sök + nyckeltal + "så funkar det" + betalförtroende).
-// Klientkomponent: sökfält med autocomplete (samma /api/search/titles som
-// beställnings-UI:t) och "så funkar det"-kort som fokuserar sökfältet.
+// Startsidans övre del: hero + sök (autocomplete mot /api/search/titles) +
+// nyckeltal + två topplistor + värdeblock (CTA fokuserar sökfältet).
 export default function HomeTop({
   count_salaries,
   count_employers,
   count_titles,
-  paymentLogos = [],
+  mostCommon,
+  highestPay,
 }: {
   count_salaries: number;
   count_employers: number;
   count_titles: number;
-  paymentLogos?: PaymentLogo[];
+  // Två topplistor (otypade supabase-embeds, samma mönster som förr).
+  mostCommon: any[];
+  highestPay: any[];
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -45,6 +33,8 @@ export default function HomeTop({
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const nf = (n: number) => n.toLocaleString("sv-SE");
+  const kr = (n: number | null) =>
+    n == null ? "–" : Math.round(n).toLocaleString("sv-SE") + " kr";
   const titlesFmt = nf(count_titles);
 
   useEffect(() => {
@@ -85,20 +75,14 @@ export default function HomeTop({
     <div className="max-w-3xl mx-auto px-4 pt-14 pb-10">
       {/* Hero */}
       <h1 className="font-serif text-4xl sm:text-5xl leading-tight text-gray-900 text-center">
-        Vad tjänar man egentligen?
+        Vad betalar din arbetsgivare?
       </h1>
       <p className="text-gray-600 text-center max-w-xl mx-auto mt-4 text-[15px] leading-relaxed">
-        Faktiska löner från kommuner och regioner, utlämnade enligt
-        offentlighetsprincipen. Inga enkäter, inga uppskattningar.
+        Faktiska utbetalda löner från {nf(count_employers)} kommuner och regioner,
+        utlämnade enligt offentlighetsprincipen. Inte enkäter, inte nationella snitt.
       </p>
-      {/* Samma tyngd som meningen ovanför (text-gray-600, 15 px) – inte den
-          finstilta proveniensraden. */}
       <p className="text-gray-600 text-center max-w-xl mx-auto mt-3 text-[15px] leading-relaxed">
-        Sök ditt yrke gratis – eller se var just du ligger i en personlig rapport.
-      </p>
-      <p className="text-gray-400 text-center max-w-xl mx-auto mt-2 text-xs leading-relaxed">
-        Utlämnade av {nf(count_employers)} kommuner och regioner under 2024 års
-        insamling. Publicerad under utgivningsbevis nr 2024-077.
+        Sök gratis. Inför lönesamtalet finns en färdig rapport för 99 kr.
       </p>
 
       {/* Sökfält */}
@@ -110,7 +94,7 @@ export default function HomeTop({
           onChange={(e) => setQ(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
-          placeholder={`Sök bland ${titlesFmt} yrkestitlar – t.ex. undersköterska`}
+          placeholder="Sök yrke – t.ex. undersköterska"
           aria-label="Sök yrkestitel"
           className="w-full rounded-[10px] border-[1.5px] border-brand px-4 py-3.5 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand/25"
         />
@@ -149,33 +133,76 @@ export default function HomeTop({
         ))}
       </div>
 
-      {/* Så funkar det */}
-      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mt-9 mb-3">
-        Så funkar det
-      </h2>
-      <div className="grid gap-3 sm:grid-cols-3">
-        {STEPS.map((step) => (
-          <button
-            key={step.n}
-            type="button"
-            onClick={focusSearch}
-            className="text-left rounded-lg border border-gray-200 p-4 hover:border-brand hover:bg-plate-blue/50 transition-colors"
-          >
-            <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-brand text-white text-sm font-semibold">
-              {step.n}
-            </span>
-            <div className="font-medium text-gray-900 mt-2.5 text-sm">
-              {step.title}
-            </div>
-            <div className="text-xs text-gray-500 mt-1 leading-relaxed">
-              {step.body(titlesFmt)}
-            </div>
-          </button>
+      {/* Två topplistor – flest anställda / högst lön.
+          Staplade på mobil, två kolumner på desktop. */}
+      <div className="mt-9 grid gap-6 sm:grid-cols-2">
+        {[
+          { heading: "Vanligaste yrkena", items: mostCommon, showCount: true },
+          { heading: "Högst lön", items: highestPay, showCount: false },
+        ].map((list) => (
+          <section key={list.heading}>
+            <h2 className="text-base font-semibold text-gray-900 mb-2">
+              {list.heading}
+            </h2>
+            <ul>
+              {list.items.map((row: any) => {
+                const t = row.generalized_titles;
+                if (!t) return null;
+                return (
+                  <li key={t.slug} className="border-b border-gray-100">
+                    <Link href={`/yrken/${t.slug}`} className="block py-2 group">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="text-brand-mid group-hover:underline text-sm font-medium break-words min-w-0">
+                          {t.title}
+                        </span>
+                        <span className="tnum text-xs text-gray-500 shrink-0">
+                          median {kr(row.median)}
+                        </span>
+                      </div>
+                      {/* Antalet = trovärdighetssignal, bara på "Vanligaste
+                          yrkena". Egen rad under titeln (mindre grå) så den
+                          smala kolumnen inte trängs. */}
+                      {list.showCount && (
+                        <div className="tnum text-xs text-gray-400 mt-0.5">
+                          {nf(row.n)} anställda
+                        </div>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
         ))}
       </div>
+      <p className="mt-4 text-sm">
+        <Link href="/#sok" className="text-brand-mid hover:underline">
+          Sök bland alla {titlesFmt} yrkestitlar →
+        </Link>
+      </p>
 
-      {/* Betalförtroende */}
-      <PaymentTrust logos={paymentLogos} />
+      {/* Värdeblock – inför löneförhandlingen (ersätter "Så funkar det").
+          Samma kortstil som stegkorten. CTA fokuserar sökfältet. */}
+      <div className="mt-9 rounded-lg border border-gray-200 p-5">
+        <h2 className="font-medium text-gray-900 text-base">
+          Inför löneförhandlingen
+        </h2>
+        <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+          Rapporten visar var du ligger i lönespannet, vad var fjärde tjänar i
+          ditt yrke, och hur din arbetsgivare står sig mot andra kommuner och
+          regioner. Upp till 5 yrken och 5 arbetsgivare. 99 kr, direkt på mejlen.
+        </p>
+        <a
+          href="#sok"
+          onClick={(e) => {
+            e.preventDefault();
+            focusSearch();
+          }}
+          className="mt-3 inline-block text-sm font-medium text-brand-mid hover:underline"
+        >
+          Välj yrke och beställ →
+        </a>
+      </div>
     </div>
   );
 }
