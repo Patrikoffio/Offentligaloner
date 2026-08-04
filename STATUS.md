@@ -1,4 +1,13 @@
-## 2026-08-03
+## 2026-08-04
+
+health_check.py klar och committad. Kräver DATABASE_URL mot molnet,
+ingen localhost-fallback. Läses från .env.health (gitignorerad).
+Kör: set -a && source .env.health && set +a && python3 pipeline/health_check.py; unset DATABASE_URL
+
+Databaslösenord roterat 2026-08-04.
+
+BASELINE: 5/6 gröna. Enda varningen = sitemap 5821 ≠ 2378
+(sitemap-filtret ej gjort, ligger som nästa punkt).## 2026-08-03
 
 GJORT (deployat till main):
 - Migration 0010 + 0011 körda i molnet. 2378 titlar oförändrat.
