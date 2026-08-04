@@ -9,8 +9,22 @@ interface TitleHit {
   title: string;
 }
 
+const STEPS = [
+  { n: 1, title: "Sök ditt yrke", body: (titles: string) => `bland ${titles} yrkestitlar med lönestatistik.` },
+  {
+    n: 2,
+    title: "Välj upp till 5 yrken och 5 kommuner",
+    body: () => "jämför det som är relevant för just dig.",
+  },
+  {
+    n: 3,
+    title: "Få din lönerapport på mejlen – 99 kr",
+    body: () => "betala med Klarna eller kort.",
+  },
+];
+
 // Startsidans övre del: hero + sök (autocomplete mot /api/search/titles) +
-// nyckeltal + två topplistor + värdeblock (CTA fokuserar sökfältet).
+// nyckeltal + två topplistor + värdeblock + "så funkar det".
 export default function HomeTop({
   count_salaries,
   count_employers,
@@ -175,14 +189,8 @@ export default function HomeTop({
           </section>
         ))}
       </div>
-      <p className="mt-4 text-sm">
-        <Link href="/#sok" className="text-brand-mid hover:underline">
-          Sök bland alla {titlesFmt} yrkestitlar →
-        </Link>
-      </p>
-
-      {/* Värdeblock – inför löneförhandlingen (ersätter "Så funkar det").
-          Samma kortstil som stegkorten. CTA fokuserar sökfältet. */}
+      {/* Värdeblock – inför löneförhandlingen. Värdet först, processen ("Så
+          funkar det") kommer efter. Primärknappen är sidans enda tydliga CTA. */}
       <div className="mt-9 rounded-lg border border-gray-200 p-5">
         <h2 className="font-medium text-gray-900 text-base">
           Inför löneförhandlingen
@@ -192,16 +200,38 @@ export default function HomeTop({
           ditt yrke, och hur din arbetsgivare står sig mot andra kommuner och
           regioner. Upp till 5 yrken och 5 arbetsgivare. 99 kr, direkt på mejlen.
         </p>
-        <a
-          href="#sok"
-          onClick={(e) => {
-            e.preventDefault();
-            focusSearch();
-          }}
-          className="mt-3 inline-block text-sm font-medium text-brand-mid hover:underline"
+        <button
+          type="button"
+          onClick={focusSearch}
+          className="mt-4 bg-brand text-white text-sm px-5 py-2.5 rounded-lg hover:opacity-90"
         >
-          Välj yrke och beställ →
-        </a>
+          Sök ditt yrke
+        </button>
+      </div>
+
+      {/* Så funkar det – processen EFTER värdeblocket (värdet först) */}
+      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mt-9 mb-3">
+        Så funkar det
+      </h2>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {STEPS.map((step) => (
+          <button
+            key={step.n}
+            type="button"
+            onClick={focusSearch}
+            className="text-left rounded-lg border border-gray-200 p-4 hover:border-brand hover:bg-plate-blue/50 transition-colors"
+          >
+            <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-brand text-white text-sm font-semibold">
+              {step.n}
+            </span>
+            <div className="font-medium text-gray-900 mt-2.5 text-sm">
+              {step.title}
+            </div>
+            <div className="text-xs text-gray-500 mt-1 leading-relaxed">
+              {step.body(titlesFmt)}
+            </div>
+          </button>
+        ))}
       </div>
     </div>
   );
