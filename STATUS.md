@@ -6,8 +6,12 @@ Kör: set -a && source .env.health && set +a && python3 pipeline/health_check.py
 
 Databaslösenord roterat 2026-08-04.
 
-BASELINE: 5/6 gröna. Enda varningen = sitemap 5821 ≠ 2378
-(sitemap-filtret ej gjort, ligger som nästa punkt).## 2026-08-03
+BASELINE: 5/6 gröna. Sitemap-filtret nu GJORT (committat, ej deployat än):
+web/app/sitemap.ts filtrerar via obligatorisk !inner-join mot
+title_national_stats (5821 → 2378). health_check kontroll 3 (sitemap
+<loc> vs titlar) blir grön efter deploy.
+
+## 2026-08-03
 
 GJORT (deployat till main):
 - Migration 0010 + 0011 körda i molnet. 2378 titlar oförändrat.
@@ -26,10 +30,9 @@ MÄTPUNKT (GSC, 28 dgr per 2026-08-02):
 Följ upp CTR omkring 2026-08-17. Mål > 1,5 %.
 
 NÄSTA:
-1. Sitemap-filter 5821 → 2378 (branchen sitemap-fix, ej gjort än)
-2. Kurerad noindex – ~3040 klicklösa varianter. De 403
+1. Kurerad noindex – ~3040 klicklösa varianter. De 403
    klickbärande behålls (AVFÄRDAT-beslutet står fast).
-3. pipeline/health_check.py
+2. pipeline/health_check.py
 
 ÖPPET:
 - tns.n ger 858 för controller, sajten visade 817. Ombyggd nu –
